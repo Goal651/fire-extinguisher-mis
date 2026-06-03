@@ -1,50 +1,95 @@
 import mongoose, { Document, Schema } from "mongoose";
-import { IUser } from "./User";
 
 export enum FireExtinguisherType {
-  WATER= "WATER",
-  CO2= "CO2",
-  FOAM= "FOAM",
-  DRY_CHEMICAL= "DRY_CHEMICAL"
+  WATER = "WATER",
+  CO2 = "CO2",
+  FOAM = "FOAM",
+  DRY_CHEMICAL = "DRY_CHEMICAL"
 }
 
 export enum FireExtinguisherSize {
-  "2.5LBS"= "2.5LBS",
-  "5LBS"= "5LBS",
-  "9LBS"= "9LBS",
-  "12LBS"= "12LBS"
+  "2.5LBS" = "2.5LBS",
+  "5LBS" = "5LBS",
+  "9LBS" = "9LBS",
+  "12LBS" = "12LBS"
+}
+
+export interface IInspectionLog {
+  inspectedAt: Date;
+  inspectorId: string;
+  result: "pass" | "fail";
+  notes?: string;
 }
 
 export interface IFireExtinguisher extends Document {
-  serialNumber: string,
-  location: string,
-  type: FireExtinguisherType,
-  size: FireExtinguisherSize,
-  installationDate: Date,
-  expireationDate: Date,
-  lastInspectionDate: Date,
-  nextInspectionDate: Date,
-  status: "active" | "expired" | "reported",
-  owner:IUser
+  extinguisherId: string;
+  ownerName: string;
+  ownerIdNumber: string;
+  ownerEmail: string;
+  ownerPhone: string;
+  dateOfIssue: Date;
+  expirationDate: Date;
+  status: "active" | "expired" | "reported" | "police_notified";
+  alertSentAt?: Date | null;
+  reminderSentAt?: Date | null;
+  policeNotifiedAt?: Date | null;
+  notes?: string;
+  // Inspection & Maintenance fields
+  scheduledInspectionDate?: Date | null;
+  inspectionStatus?: "none" | "pending" | "completed";
+  scheduledMaintenanceDate?: Date | null;
+  maintenanceStatus?: "none" | "scheduled" | "completed";
+  maintenanceNotes?: string;
+  inspectionLogs: IInspectionLog[];
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 const extinguisherSchema = new Schema<IFireExtinguisher>(
   {
-    serialNumber: { type: String, required: true, unique: true },
-    location: { type: String, required: true },
-    type: { type: String, enum: Object.values(FireExtinguisherType), required: true },
-    size: { type: String, enum: Object.values(FireExtinguisherSize), required: true },
-    installationDate: { type: Date, required: true },
-    expireationDate: { type: Date, required: true },
-    lastInspectionDate: { type: Date, required: true },
-    nextInspectionDate: { type: Date, required: true },
-    status: { type: String, enum: ["active", "expired", "reported"], default: "active" },
-    owner: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    extinguisherId: { type: String, required: true, unique: true },
+    ownerName: { type: String, required: true },
+    ownerIdNumber: { type: String, required: true },
+    ownerEmail: { type: String, required: true },
+    ownerPhone: { type: String, required: true },
+    dateOfIssue: { type: Date, required: true },
+    expirationDate: { type: Date, required: true },
+    status: {
+      type: String,
+      enum: ["active", "expired", "reported", "police_notified"],
+      default: "active",
+    },
+    alertSentAt: { type: Date, default: null },
+    reminderSentAt: { type: Date, default: null },
+    policeNotifiedAt: { type: Date, default: null },
+    notes: { type: String },
+    // Inspection & Maintenance
+    scheduledInspectionDate: { type: Date, default: null },
+    inspectionStatus: {
+      type: String,
+      enum: ["none", "pending", "completed"],
+      default: "none",
+    },
+    scheduledMaintenanceDate: { type: Date, default: null },
+    maintenanceStatus: {
+      type: String,
+      enum: ["none", "scheduled", "completed"],
+      default: "none",
+    },
+    maintenanceNotes: { type: String },
+    inspectionLogs: [
+      {
+        inspectedAt: { type: Date, default: Date.now },
+        inspectorId: { type: String, required: true },
+        result: { type: String, enum: ["pass", "fail"], required: true },
+        notes: { type: String },
+      },
+    ],
   },
+  { timestamps: true }
 );
-
 
 export default mongoose.model<IFireExtinguisher>(
   "FireExtinguisher",
-  extinguisherSchema,
+  extinguisherSchema
 );

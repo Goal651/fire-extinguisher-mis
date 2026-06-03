@@ -5,7 +5,7 @@ export interface IUser {
     lastName: string;
     email: string;
     password: string;
-    role: "admin" | "user";
+    role: "admin" | "user" | "inspector";
     otpCode: string;
     otpExpiry: Date;
     resetToken: string;
@@ -36,7 +36,7 @@ export const userSchema = new mongoose.Schema<IUser>({
 
     role: {
         type: String,
-        enum: ["admin", "user"],
+        enum: ["admin", "user", "inspector"],
         default: "user",
     },
     otpCode: {

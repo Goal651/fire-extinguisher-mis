@@ -38,7 +38,11 @@ export const login = async (req: Request, res: Response) => {
 
     const otp = generateOTP();
 
-  
+    // Save OTP and its expiration (10 minutes)
+    user.otpCode = otp;
+    user.otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
+    await user.save();
+
     await sendEmail(
       email,
       "Your OTP Code",
@@ -66,20 +70,99 @@ export const login = async (req: Request, res: Response) => {
 };
 
 export const verifyOTP = async (req: Request, res: Response) => {
+  try {
+    const { email, otp } = req.body;
 
+    const user = await User.findOne({ email: email.toLowerCase() });
+
+    if (!user) {
+      logger.warn(`OTP verification attempt for non-existent email: ${email}`);
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials",
+      });
+    }
+
+    if (!user.otpCode || user.otpCode !== otp || !user.otpExpiry || user.otpExpiry < new Date()) {
+      logger.warn(`Invalid or expired OTP for: ${email}`);
+      return res.status(401).json({
+        success: false,
+        message: "Invalid or expired OTP",
+      });
+    }
+
+    // Clear OTP fields upon successful verification
+    user.otpCode = "";
+    user.otpExpiry = new Date(0);
+    await user.save();
+
+    const token = generateToken(user._id.toString(), user.email, user.role);
+
+    logger.info(`OTP verified successfully for: ${email}`);
+
+    return res.json({
+      success: true,
+      token,
+      admin: {
+        _id: user._id,
+        name: `${user.firstName} ${user.lastName}`,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    logger.error("OTP verification failed", error);
+    return res.status(500).json({
+      success: false,
+      message: "Verification failed",
+    });
+  }
 };
 
-export const resendOtp = async (req: any, res: Response) => {
-  const { email } = req.body;
+export const resendOtp = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
 
-  const otp = generateOTP();
+    const user = await User.findOne({ email: email.toLowerCase() });
 
-  await sendEmail(email, "OTP Code", `<h1>${otp}</h1>`);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
 
-  return res.json({
-    success: true,
-    message: "OTP resent successfully",
-  });
+    const otp = generateOTP();
+
+    // Save OTP and its expiration (10 minutes)
+    user.otpCode = otp;
+    user.otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
+    await user.save();
+
+    await sendEmail(
+      email,
+      "Your OTP Code",
+      `
+      <h2>Company XYZ Login OTP</h2>
+      <p>Your OTP is:</p>
+      <h1>${otp}</h1>
+      <p>Expires in 10 minutes.</p>
+      `,
+    );
+
+    logger.info(`OTP resent successfully to: ${email}`);
+
+    return res.json({
+      success: true,
+      message: "OTP resent successfully",
+    });
+  } catch (error) {
+    logger.error("Resend OTP failed", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to resend OTP",
+    });
+  }
 };
 
 export const me = async (req: any, res: Response) => {
