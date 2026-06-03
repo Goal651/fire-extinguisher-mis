@@ -210,7 +210,68 @@ export const sendExpiryWarningEmail = async (
 };
 
 // ─────────────────────────────────────────────
-// Police Escalation Email (to owner)
+// Expired Notification Email (to owner + admin + inspector)
+// Sent after status flips to "expired"
+// ─────────────────────────────────────────────
+
+export const sendExpiredNotificationEmail = async (
+  extinguisher: IFireExtinguisher,
+) => {
+  const ownerHtml = layout(
+    `
+    <table cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
+      <tr><td>${badge("EXPIRED", "#c62828")}</td></tr>
+    </table>
+    ${heading("Your Fire Extinguisher Has Expired")}
+    ${paragraph(`Dear <strong>${extinguisher.ownerName}</strong>,`)}
+    ${paragraph("Your fire extinguisher has officially <strong>expired</strong> as of today. You are required to take immediate action to remain compliant with safety regulations.")}
+    ${infoTable([
+      { label: "Extinguisher ID", value: extinguisher.extinguisherId },
+      { label: "Expiration Date", value: extinguisher.expirationDate.toDateString() },
+      { label: "Status", value: "Expired" },
+    ])}
+    ${divider()}
+    ${paragraph("Please contact <strong>TZW LTD</strong> immediately to schedule an inspection or renewal.")}
+    ${paragraph('<span style="color:#c62828;font-weight:600;">Failure to respond within 3 days will result in escalation to the relevant authorities.</span>')}
+  `,
+    "Fire Extinguisher Expired",
+  );
+
+  const staffHtml = layout(
+    `
+    <table cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
+      <tr><td>${badge("ACTION REQUIRED", "#1565c0")}</td></tr>
+    </table>
+    ${heading("Extinguisher Expired — Staff Alert")}
+    ${paragraph("The following fire extinguisher has just been marked as <strong>expired</strong> by the system. Please follow up with the owner promptly.")}
+    ${infoTable([
+      { label: "Extinguisher ID", value: extinguisher.extinguisherId },
+      { label: "Owner Name", value: extinguisher.ownerName },
+      { label: "Owner Email", value: extinguisher.ownerEmail },
+      { label: "Owner Phone", value: extinguisher.ownerPhone },
+      { label: "Owner ID Number", value: extinguisher.ownerIdNumber },
+      { label: "Expiration Date", value: extinguisher.expirationDate.toDateString() },
+    ])}
+    ${divider()}
+    ${paragraph("This alert was generated automatically by the TZW LTD Safety Management System.")}
+  `,
+    "Extinguisher Expired — Staff Alert",
+  );
+
+  // Notify owner and staff in parallel
+  await Promise.all([
+    sendEmail(
+      extinguisher.ownerEmail,
+      "ACTION REQUIRED: Your Fire Extinguisher Has Expired",
+      ownerHtml,
+    ),
+    sendEmail(
+      [process.env.ADMIN_EMAIL!, process.env.INSPECTOR_EMAIL!].filter(Boolean) as string[],
+      `[Staff Alert] Extinguisher ${extinguisher.extinguisherId} Has Expired`,
+      staffHtml,
+    ),
+  ]);
+};
 // ─────────────────────────────────────────────
 
 export const sendPoliceEscalationEmail = async (
