@@ -1,19 +1,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-
 import { useForm } from "react-hook-form";
-
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import toast from "react-hot-toast";
-
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
-
 import { register } from "@/services/authService";
-
 import { registerSchema, RegisterSchema } from "@/validations/registerSchema";
+import { UserRegistration } from "@/types";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -28,7 +23,15 @@ export default function RegisterPage() {
 
   const onSubmit = async (data: RegisterSchema) => {
     try {
-      await register(data.name, data.email, data.password);
+
+      const req: UserRegistration = {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        password: data.password
+      }
+
+      await register(req);
 
       toast.success("Registration successful. Please login.");
 
@@ -56,9 +59,15 @@ export default function RegisterPage() {
         </h1>
 
         <Input
-          label="Full Name"
-          {...registerField("name")}
-          error={errors.name?.message}
+          label="First Name"
+          {...registerField("firstName")}
+          error={errors.firstName?.message}
+        />
+
+        <Input
+          label="Last Name"
+          {...registerField("lastName")}
+          error={errors.lastName?.message}
         />
 
         <Input
