@@ -1,5 +1,5 @@
 FROM node:20-alpine
+RUN npm install -g pnpm nodemon ts-node
 WORKDIR /app
-# Source, shared folder, and node_modules are all bind-mounted from the host.
-# No install step — use your system pnpm-installed node_modules.
-CMD ["node_modules/.bin/nodemon", "--watch", "src", "--ext", "ts", "--exec", "node_modules/.bin/ts-node", "src/index.ts"]
+# Use the host pnpm store mounted at runtime — zero network downloads.
+CMD sh -c "pnpm install --prefer-offline && nodemon --watch src --ext ts --exec ts-node src/index.ts"
