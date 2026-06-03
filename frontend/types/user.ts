@@ -11,6 +11,7 @@ export interface User {
     otpExpiry: Date;
     resetToken: string;
     resetTokenExpiry: Date;
+    createdAt:Date
 }
 
 /** Represents the currently logged-in user (returned by /auth/me) */
@@ -28,4 +29,13 @@ export interface UserRegistration {
     lastName: string;
     email: string;
     password: string;
+}
+
+interface UserItem {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: "admin" | "user" | "inspector";
+  createdAt: string;
 }

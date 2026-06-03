@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import { PackageSearch, Flame } from "lucide-react";
 import { FireExtinguisher } from "@/types";
 import { extinguisherService } from "@/services/extinguisherService";
 import { useAuthContext } from "@/context/AuthContext";

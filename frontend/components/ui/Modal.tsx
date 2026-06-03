@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { Trash2 } from "lucide-react";
 import Button from "./Button";
 
 interface Props {
@@ -22,7 +23,6 @@ export default function Modal({
   confirmLabel = "Delete",
   confirmVariant = "danger",
 }: Props) {
-  // Close on Escape
   useEffect(() => {
     if (!open) return;
     const handler = (e: KeyboardEvent) => {
@@ -45,30 +45,21 @@ export default function Modal({
         style={{ backgroundColor: "#ffffff" }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Icon */}
         <div
-          className="w-10 h-10 rounded-full flex items-center justify-center text-lg"
+          className="w-10 h-10 rounded-full flex items-center justify-center"
           style={{ backgroundColor: "#ffeaea" }}
         >
-          🗑
+          <Trash2 size={18} color="#d32f2f" />
         </div>
 
         <div>
-          <h2 className="text-base font-bold" style={{ color: "#2f2f2f" }}>
-            {title}
-          </h2>
-          <p className="mt-1 text-sm leading-relaxed" style={{ color: "#666666" }}>
-            {message}
-          </p>
+          <h2 className="text-base font-bold" style={{ color: "#2f2f2f" }}>{title}</h2>
+          <p className="mt-1 text-sm leading-relaxed" style={{ color: "#666666" }}>{message}</p>
         </div>
 
         <div className="flex gap-3 pt-1">
-          <Button variant="secondary" className="flex-1" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button variant={confirmVariant} className="flex-1" onClick={onConfirm}>
-            {confirmLabel}
-          </Button>
+          <Button variant="secondary" className="flex-1" onClick={onClose}>Cancel</Button>
+          <Button variant={confirmVariant} className="flex-1" onClick={onConfirm}>{confirmLabel}</Button>
         </div>
       </div>
     </div>

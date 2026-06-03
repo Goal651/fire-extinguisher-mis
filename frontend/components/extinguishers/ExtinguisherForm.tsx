@@ -1,14 +1,8 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-
 import { zodResolver } from "@hookform/resolvers/zod";
-
-import {
-  extinguisherSchema,
-  ExtinguisherSchema,
-} from "@/validations/extinguisherSchema";
-
+import { extinguisherSchema, ExtinguisherSchema } from "@/validations/extinguisherSchema";
 import Input from "@/components/ui/Input";
 import Textarea from "@/components/ui/Textarea";
 import Button from "@/components/ui/Button";
@@ -29,65 +23,81 @@ export default function ExtinguisherForm({ defaultValues, onSubmit }: Props) {
   });
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <Input
-        label="Extinguisher ID"
-        placeholder="e.g., EXT-2024-001"
-        {...register("extinguisherId")}
-        error={errors.extinguisherId?.message}
-      />
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+      {/* Owner details */}
+      <fieldset className="space-y-4">
+        <legend className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: "#999" }}>
+          Extinguisher
+        </legend>
+        <Input
+          label="Extinguisher ID"
+          placeholder="e.g. EXT-2024-001"
+          {...register("extinguisherId")}
+          error={errors.extinguisherId?.message}
+        />
+      </fieldset>
 
-      <Input
-        label="Owner Name"
-        placeholder="Full name of the owner"
-        {...register("ownerName")}
-        error={errors.ownerName?.message}
-      />
+      <fieldset className="space-y-4">
+        <legend className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: "#999" }}>
+          Owner Details
+        </legend>
+        <Input
+          label="Full Name"
+          placeholder="Owner's full name"
+          {...register("ownerName")}
+          error={errors.ownerName?.message}
+        />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Input
+            label="ID Number"
+            placeholder="National ID / Passport"
+            {...register("ownerIdNumber")}
+            error={errors.ownerIdNumber?.message}
+          />
+          <Input
+            label="Phone"
+            placeholder="+250 7XX XXX XXX"
+            {...register("ownerPhone")}
+            error={errors.ownerPhone?.message}
+          />
+        </div>
+        <Input
+          label="Email"
+          type="email"
+          placeholder="owner@example.com"
+          {...register("ownerEmail")}
+          error={errors.ownerEmail?.message}
+        />
+      </fieldset>
 
-      <Input
-        label="Owner ID Number"
-        placeholder="National ID or passport number"
-        {...register("ownerIdNumber")}
-        error={errors.ownerIdNumber?.message}
-      />
-
-      <Input
-        label="Owner Email"
-        type="email"
-        placeholder="owner@example.com"
-        {...register("ownerEmail")}
-        error={errors.ownerEmail?.message}
-      />
-
-      <Input
-        label="Owner Phone"
-        placeholder="Phone number with country code"
-        {...register("ownerPhone")}
-        error={errors.ownerPhone?.message}
-      />
-
-      <Input
-        label="Issue Date"
-        type="date"
-        {...register("dateOfIssue")}
-        error={errors.dateOfIssue?.message}
-      />
-
-      <Input
-        label="Expiration Date"
-        type="date"
-        {...register("expirationDate")}
-        error={errors.expirationDate?.message}
-      />
+      <fieldset className="space-y-4">
+        <legend className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: "#999" }}>
+          Dates
+        </legend>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Input
+            label="Issue Date"
+            type="date"
+            {...register("dateOfIssue")}
+            error={errors.dateOfIssue?.message}
+          />
+          <Input
+            label="Expiration Date"
+            type="date"
+            {...register("expirationDate")}
+            error={errors.expirationDate?.message}
+          />
+        </div>
+      </fieldset>
 
       <Textarea
         label="Notes"
-        placeholder="Additional notes or comments (optional)"
+        placeholder="Additional notes (optional)"
         {...register("notes")}
       />
 
-      <Button className="w-full" loading={isSubmitting}>
-        {isSubmitting ? "Saving..." : "Save"}
+      <Button loading={isSubmitting} className="w-full">
+        {isSubmitting ? "Saving…" : "Save Record"}
       </Button>
     </form>
   );

@@ -10,6 +10,7 @@ export interface IUser extends Document {
     otpExpiry: Date;
     resetToken: string;
     resetTokenExpiry: Date;
+    createdAt: Date
 }
 
 export const userSchema = new mongoose.Schema<IUser>({
@@ -29,7 +30,7 @@ export const userSchema = new mongoose.Schema<IUser>({
         unique: true,
     },
 
-    password: { 
+    password: {
         type: String,
         required: true,
     },
@@ -50,7 +51,11 @@ export const userSchema = new mongoose.Schema<IUser>({
     },
     resetTokenExpiry: {
         type: Date,
-    }
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now,
+    },
 });
 
 export default mongoose.model<IUser>("User", userSchema);
