@@ -32,6 +32,10 @@ const options: swaggerJsdoc.Options = {
         name: "Extinguisher",
         description: "Fire extinguisher CRUD, inspections, maintenance, and reporting",
       },
+      {
+        name: "Reports",
+        description: "Real-time analytics: stock levels, inspection status, expired units, and maintenance history — all with daily/monthly/yearly trend data",
+      },
     ],
     components: {
       securitySchemes: {
@@ -733,6 +737,164 @@ const options: swaggerJsdoc.Options = {
                   location: { type: "string", example: "body" },
                 },
               },
+            },
+          },
+        },
+        // ──────────────────────────────────────────
+        // Report Schemas
+        // ──────────────────────────────────────────
+        PeriodBucket: {
+          type: "object",
+          properties: {
+            label: { type: "string", example: "2025-06", description: "Period label: YYYY-MM-DD / YYYY-MM / YYYY" },
+            count: { type: "integer", example: 12 },
+          },
+        },
+        StockReportData: {
+          type: "object",
+          properties: {
+            total: { type: "integer", example: 150 },
+            breakdown: {
+              type: "object",
+              properties: {
+                active: { type: "integer", example: 100 },
+                expired: { type: "integer", example: 30 },
+                reported: { type: "integer", example: 15 },
+                police_notified: { type: "integer", example: 5 },
+              },
+            },
+            trend: {
+              type: "array",
+              items: { $ref: "#/components/schemas/PeriodBucket" },
+              description: "Number of extinguishers registered per period bucket",
+            },
+          },
+        },
+        InspectionTrendBucket: {
+          type: "object",
+          properties: {
+            label: { type: "string", example: "2025-06" },
+            count: { type: "integer", example: 20 },
+            pass: { type: "integer", example: 15 },
+            fail: { type: "integer", example: 5 },
+          },
+        },
+        InspectionReportData: {
+          type: "object",
+          properties: {
+            totalInspectionsLogged: { type: "integer", example: 200 },
+            statusBreakdown: {
+              type: "object",
+              properties: {
+                none: { type: "integer", example: 60 },
+                pending: { type: "integer", example: 40 },
+                completed: { type: "integer", example: 50 },
+              },
+            },
+            resultBreakdown: {
+              type: "object",
+              properties: {
+                pass: { type: "integer", example: 160 },
+                fail: { type: "integer", example: 40 },
+              },
+            },
+            passRate: { type: "number", example: 80.00, description: "Percentage of inspections that passed (0-100)" },
+            trend: {
+              type: "array",
+              items: { $ref: "#/components/schemas/InspectionTrendBucket" },
+            },
+          },
+        },
+        ExpiredExtinguisherItem: {
+          type: "object",
+          properties: {
+            _id: { type: "string", example: "64b1f9c2e4b0f1a2b3c4d5e6" },
+            extinguisherId: { type: "string", example: "EXT-2024-001" },
+            ownerName: { type: "string", example: "John Doe" },
+            ownerEmail: { type: "string", example: "john@example.com" },
+            ownerPhone: { type: "string", example: "+250788000000" },
+            expirationDate: { type: "string", format: "date-time" },
+            status: { type: "string", enum: ["expired", "reported", "police_notified"] },
+            daysSinceExpiry: { type: "integer", example: 45 },
+            policeNotified: { type: "boolean", example: false },
+            policeNotifiedAt: { type: "string", format: "date-time", nullable: true },
+          },
+        },
+        ExpiredReportData: {
+          type: "object",
+          properties: {
+            total: { type: "integer", example: 50 },
+            policeNotifiedCount: { type: "integer", example: 5 },
+            trend: {
+              type: "array",
+              items: { $ref: "#/components/schemas/PeriodBucket" },
+              description: "Number of extinguishers that expired per period bucket",
+            },
+            records: {
+              type: "array",
+              items: { $ref: "#/components/schemas/ExpiredExtinguisherItem" },
+            },
+          },
+        },
+        ExpiredSummaryData: {
+          type: "object",
+          properties: {
+            total: { type: "integer", example: 50 },
+            policeNotifiedCount: { type: "integer", example: 5 },
+            trend: {
+              type: "array",
+              items: { $ref: "#/components/schemas/PeriodBucket" },
+            },
+          },
+        },
+        MaintenanceHistoryItem: {
+          type: "object",
+          properties: {
+            _id: { type: "string", example: "64b1f9c2e4b0f1a2b3c4d5e6" },
+            extinguisherId: { type: "string", example: "EXT-2024-001" },
+            ownerName: { type: "string", example: "John Doe" },
+            scheduledMaintenanceDate: { type: "string", format: "date-time", nullable: true },
+            maintenanceStatus: { type: "string", enum: ["none", "scheduled", "completed"] },
+            maintenanceNotes: { type: "string", nullable: true },
+            updatedAt: { type: "string", format: "date-time" },
+          },
+        },
+        MaintenanceReportData: {
+          type: "object",
+          properties: {
+            statusBreakdown: {
+              type: "object",
+              properties: {
+                none: { type: "integer", example: 80 },
+                scheduled: { type: "integer", example: 40 },
+                completed: { type: "integer", example: 30 },
+              },
+            },
+            trend: {
+              type: "array",
+              items: { $ref: "#/components/schemas/PeriodBucket" },
+              description: "Number of maintenance events per period bucket",
+            },
+            records: {
+              type: "array",
+              items: { $ref: "#/components/schemas/MaintenanceHistoryItem" },
+            },
+          },
+        },
+        MaintenanceSummaryData: {
+          type: "object",
+          properties: {
+            statusBreakdown: {
+              type: "object",
+              properties: {
+                none: { type: "integer", example: 80 },
+                scheduled: { type: "integer", example: 40 },
+                completed: { type: "integer", example: 30 },
+              },
+            },
+            trend: {
+              type: "array",
+              items: { $ref: "#/components/schemas/PeriodBucket" },
             },
           },
         },

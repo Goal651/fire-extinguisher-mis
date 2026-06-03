@@ -12,6 +12,7 @@ import { swaggerSpec } from "./config/swagger";
 import authRoutes from "./routes/authRoutes";
 import extinguisherRoutes from "./routes/extinguisherRoutes";
 import adminRoutes from "./routes/adminRoutes";
+import reportRoutes from "./routes/reportRoutes";
 
 import { startCronJobs } from "./services/cronService";
 
@@ -86,6 +87,8 @@ app.use("/api/extinguishers", extinguisherRoutes);
 
 app.use("/api/admin", adminRoutes);
 
+app.use("/api/reports", reportRoutes);
+
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
@@ -99,7 +102,7 @@ const startServer = async () => {
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
-    
+
   } catch (error) {
     console.error(error);
 
