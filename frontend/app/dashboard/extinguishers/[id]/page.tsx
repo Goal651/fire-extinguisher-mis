@@ -196,6 +196,15 @@ export default function ExtinguisherDetailPage() {
           <Detail label="Email" value={data.ownerEmail} />
           <Detail label="Phone" value={data.ownerPhone} />
           <Detail
+            label="Type"
+            value={
+              data.type
+                ? data.type.replace("_", " ").charAt(0) + data.type.replace("_", " ").slice(1).toLowerCase()
+                : "—"
+            }
+          />
+          <Detail label="Size" value={data.size ? data.size.replace("LBS", " lbs") : "—"} />
+          <Detail
             label="Issue Date"
             value={new Date(data.dateOfIssue).toLocaleDateString()}
           />

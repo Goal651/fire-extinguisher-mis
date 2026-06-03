@@ -31,6 +31,8 @@ export interface FireExtinguisher {
     ownerPhone: string;
     dateOfIssue: string;
     expirationDate: string;
+    type:FireExtinguisherType,
+    size:FireExtinguisherSize,
     status: ExtinguisherStatus;
     alertSentAt?: string | null;
     reminderSentAt?: string | null;

@@ -1,0 +1,202 @@
+version: "3.9"
+
+services:
+
+  # ────────────────────────────────────────────
+  # Infrastructure
+  # ────────────────────────────────────────────
+
+  mongo:
+    image: mongo:7
+    container_name: mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - backend
+
+  rabbitmq:
+    image: rabbitmq:4-management
+    container_name: rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672"    # AMQP
+      - "15672:15672"  # Management UI  →  http://localhost:15672  (guest/guest)
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - backend
+
+  # ────────────────────────────────────────────
+  # API Gateway  :3000
+  # ────────────────────────────────────────────
+
+  gateway:
+    build:
+      context: ./services/gateway
+      dockerfile: Dockerfile
+    container_name: gateway
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      JWT_SECRET: ${JWT_SECRET}
+      AUTH_SERVICE_URL: http://auth-service:3001
+      EXTINGUISHER_SERVICE_URL: http://extinguisher-service:3002
+      ADMIN_SERVICE_URL: http://admin-service:3003
+      REPORT_SERVICE_URL: http://report-service:3004
+      FRONTEND_URL: ${FRONTEND_URL}
+    depends_on:
+      - auth-service
+      - extinguisher-service
+      - admin-service
+      - report-service
+    networks:
+      - backend
+
+  # ────────────────────────────────────────────
+  # Auth Service  :3001
+  # ────────────────────────────────────────────
+
+  auth-service:
+    build:
+      context: ./services/auth-service
+      dockerfile: Dockerfile
+    container_name: auth-service
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      PORT: 3001
+      MONGODB_URI: mongodb://mongo:27017/fire_extinguisher_db
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN}
+      MAIL_HOST: ${MAIL_HOST}
+      MAIL_PORT: ${MAIL_PORT}
+      MAIL_USER: ${MAIL_USER}
+      MAIL_PASS: ${MAIL_PASS}
+      MAIL_FROM: ${MAIL_FROM}
+      FRONTEND_URL: ${FRONTEND_URL}
+    depends_on:
+      - mongo
+    networks:
+      - backend
+
+  # ────────────────────────────────────────────
+  # Extinguisher Service  :3002
+  # ────────────────────────────────────────────
+
+  extinguisher-service:
+    build:
+      context: ./services/extinguisher-service
+      dockerfile: Dockerfile
+    container_name: extinguisher-service
+    restart: unless-stopped
+    ports:
+      - "3002:3002"
+    environment:
+      PORT: 3002
+      MONGODB_URI: mongodb://mongo:27017/fire_extinguisher_db
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN}
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      FRONTEND_URL: ${FRONTEND_URL}
+    depends_on:
+      mongo:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - backend
+
+  # ────────────────────────────────────────────
+  # Admin Service  :3003
+  # ────────────────────────────────────────────
+
+  admin-service:
+    build:
+      context: ./services/admin-service
+      dockerfile: Dockerfile
+    container_name: admin-service
+    restart: unless-stopped
+    ports:
+      - "3003:3003"
+    environment:
+      PORT: 3003
+      MONGODB_URI: mongodb://mongo:27017/fire_extinguisher_db
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN}
+      FRONTEND_URL: ${FRONTEND_URL}
+    depends_on:
+      - mongo
+    networks:
+      - backend
+
+  # ────────────────────────────────────────────
+  # Report Service  :3004
+  # ────────────────────────────────────────────
+
+  report-service:
+    build:
+      context: ./services/report-service
+      dockerfile: Dockerfile
+    container_name: report-service
+    restart: unless-stopped
+    ports:
+      - "3004:3004"
+    environment:
+      PORT: 3004
+      MONGODB_URI: mongodb://mongo:27017/fire_extinguisher_db
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN}
+      FRONTEND_URL: ${FRONTEND_URL}
+    depends_on:
+      - mongo
+    networks:
+      - backend
+
+  # ────────────────────────────────────────────
+  # Notification Service  :3005
+  # ────────────────────────────────────────────
+
+  notification-service:
+    build:
+      context: ./services/notification-service
+      dockerfile: Dockerfile
+    container_name: notification-service
+    restart: unless-stopped
+    ports:
+      - "3005:3005"
+    environment:
+      PORT: 3005
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      MAIL_HOST: ${MAIL_HOST}
+      MAIL_PORT: ${MAIL_PORT}
+      MAIL_USER: ${MAIL_USER}
+      MAIL_PASS: ${MAIL_PASS}
+      MAIL_FROM: ${MAIL_FROM}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      INSPECTOR_EMAIL: ${INSPECTOR_EMAIL}
+      POLICE_EMAIL: ${POLICE_EMAIL}
+      COMPANY_NAME: ${COMPANY_NAME}
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - backend
+
+volumes:
+  mongo_data:
+
+networks:
+  backend:
+    driver: bridge

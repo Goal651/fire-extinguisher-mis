@@ -1,13 +1,14 @@
-import amqplib, { Channel, Connection } from "amqplib";
+import amqplib, { Channel, ChannelModel } from "amqplib";
 
-let connection: Connection | null = null;
+// amqplib >= 0.10 returns ChannelModel from connect(), not Connection
+let model: ChannelModel | null = null;
 let channel: Channel | null = null;
 
 export const QUEUES = {
-  EXPIRY_WARNING:      "extinguisher.expiry_warning",
-  EXPIRED:             "extinguisher.expired",
-  POLICE_ESCALATION:   "extinguisher.police_escalation",
-  ALREADY_EXPIRED:     "extinguisher.already_expired",
+  EXPIRY_WARNING:    "extinguisher.expiry_warning",
+  EXPIRED:           "extinguisher.expired",
+  POLICE_ESCALATION: "extinguisher.police_escalation",
+  ALREADY_EXPIRED:   "extinguisher.already_expired",
 } as const;
 
 export type QueueName = (typeof QUEUES)[keyof typeof QUEUES];
@@ -20,8 +21,8 @@ export const connectRabbitMQ = async (): Promise<Channel> => {
 
   while (retries > 0) {
     try {
-      connection = await amqplib.connect(url);
-      channel = await connection.createChannel();
+      model = await amqplib.connect(url);
+      channel = await model.createChannel();
 
       // Assert all queues durable so messages survive RabbitMQ restart
       for (const q of Object.values(QUEUES)) {
@@ -30,16 +31,16 @@ export const connectRabbitMQ = async (): Promise<Channel> => {
 
       console.log("[RabbitMQ] Connected and queues asserted");
 
-      connection.on("error", (err) => {
+      model.on("error", (err: Error) => {
         console.error("[RabbitMQ] Connection error:", err.message);
         channel = null;
-        connection = null;
+        model = null;
       });
 
-      connection.on("close", () => {
-        console.warn("[RabbitMQ] Connection closed — will reconnect on next publish");
+      model.on("close", () => {
+        console.warn("[RabbitMQ] Connection closed — will reconnect on next use");
         channel = null;
-        connection = null;
+        model = null;
       });
 
       return channel;
@@ -71,7 +72,7 @@ export const consumeMessages = async (
       ch.ack(msg);
     } catch (err) {
       console.error(`[RabbitMQ] Handler error on queue ${queue}:`, err);
-      ch.nack(msg, false, false); // discard — prevent infinite loop
+      ch.nack(msg, false, false); // discard — prevents infinite retry loop
     }
   });
 };
