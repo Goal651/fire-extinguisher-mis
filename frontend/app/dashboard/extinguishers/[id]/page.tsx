@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import toast from "react-hot-toast";
+import { Search, Wrench, CalendarClock, LucideIcon } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import Input from "@/components/ui/Input";
@@ -268,8 +269,7 @@ export default function ExtinguisherDetailPage() {
       {/* ── Inspector: Log Inspection ─────────────────────────────── */}
       {role === "inspector" && (
         <>
-          {canInspect ? (
-            <div className="card space-y-4">
+          {canInspect ? (            <div className="card space-y-4">
               <div>
                 <h2
                   className="text-lg font-bold"
@@ -324,7 +324,7 @@ export default function ExtinguisherDetailPage() {
             </div>
           ) : (
             inspectBlocked && (
-              <InfoBanner icon="🔍" message={inspectBlocked} />
+              <InfoBanner Icon={Search} message={inspectBlocked} />
             )
           )}
         </>
@@ -374,7 +374,7 @@ export default function ExtinguisherDetailPage() {
             </div>
           ) : (
             maintainBlocked && (
-              <InfoBanner icon="🔧" message={maintainBlocked} />
+              <InfoBanner Icon={Wrench} message={maintainBlocked} />
             )
           )}
         </>
@@ -410,7 +410,7 @@ export default function ExtinguisherDetailPage() {
             </div>
           ) : (
             scheduleBlocked && (
-              <InfoBanner icon="📅" message={scheduleBlocked} />
+              <InfoBanner Icon={CalendarClock} message={scheduleBlocked} />
             )
           )}
         </>
@@ -483,17 +483,13 @@ function Detail({ label, value }: { label: string; value: string }) {
   );
 }
 
-function InfoBanner({ icon, message }: { icon: string; message: string }) {
+function InfoBanner({ Icon, message }: { Icon: LucideIcon; message: string }) {
   return (
     <div
       className="flex items-start gap-3 px-4 py-3 rounded-lg border text-sm"
-      style={{
-        backgroundColor: "#F9F9F9",
-        borderColor: "#D2D2D2",
-        color: "#666666",
-      }}
+      style={{ backgroundColor: "#f9f9f9", borderColor: "#e0e0e0", color: "#666" }}
     >
-      <span className="text-base flex-shrink-0">{icon}</span>
+      <Icon size={15} className="flex-shrink-0 mt-0.5" style={{ color: "#999" }} />
       <span>{message}</span>
     </div>
   );

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { CheckCircle2, XCircle, Sparkles } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { userService } from "@/services/userService";
 import { useAuthContext } from "@/context/AuthContext";
@@ -101,12 +102,15 @@ export default function DataIntegrityPage() {
         <div className="card space-y-4">
           <div className="flex items-center gap-3">
             <div
-              className="w-9 h-9 rounded-full flex items-center justify-center text-lg flex-shrink-0"
+              className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0"
               style={{
                 backgroundColor: result.integrityPassed ? "#e8f5e9" : "#ffeaea",
               }}
             >
-              {result.integrityPassed ? "✅" : "❌"}
+              {result.integrityPassed
+                ? <CheckCircle2 size={18} color="#2e7d32" />
+                : <XCircle size={18} color="#d32f2f" />
+              }
             </div>
             <div>
               <p className="font-semibold text-sm" style={{ color: "#2f2f2f" }}>
@@ -146,8 +150,8 @@ export default function DataIntegrityPage() {
       {cleanupResult && (
         <div className="card space-y-3">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full flex items-center justify-center text-lg" style={{ backgroundColor: "#e8f5e9" }}>
-              🧹
+            <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ backgroundColor: "#e8f5e9" }}>
+              <Sparkles size={18} color="#2e7d32" />
             </div>
             <p className="font-semibold text-sm" style={{ color: "#2f2f2f" }}>Cleanup Complete</p>
           </div>

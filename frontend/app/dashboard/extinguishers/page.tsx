@@ -138,7 +138,15 @@ function EmptyState({ search, status }: { search: string; status: string }) {
   const hasFilter = search || status;
   return (
     <div className="card flex flex-col items-center justify-center py-16 gap-2 text-center">
-      <span className="text-3xl">🧯</span>
+      <div
+        className="w-12 h-12 rounded-full flex items-center justify-center"
+        style={{ backgroundColor: "#f4f4f4" }}
+      >
+        {hasFilter
+          ? <PackageSearch size={22} style={{ color: "#999" }} />
+          : <Flame size={22} style={{ color: "#999" }} />
+        }
+      </div>
       <p className="font-semibold" style={{ color: "#2f2f2f" }}>
         {hasFilter ? "No results found" : "No extinguishers yet"}
       </p>

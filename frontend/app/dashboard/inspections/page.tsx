@@ -152,7 +152,7 @@ export default function InspectionsPage() {
               className="card text-center py-8 text-sm"
               style={{ color: "#2E7D32" }}
             >
-              ✅ All extinguishers are up-to-date. No inspections needed right now.
+              All extinguishers are up-to-date. No inspections needed right now.
             </div>
           )}
 

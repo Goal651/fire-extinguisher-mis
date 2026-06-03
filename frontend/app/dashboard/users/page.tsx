@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { UserX } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import { userService } from "@/services/userService";
@@ -163,7 +164,12 @@ export default function UsersPage() {
           </div>
         ) : users.length === 0 ? (
           <div className="flex flex-col items-center py-16 gap-2 text-center">
-            <span className="text-3xl">👥</span>
+            <div
+              className="w-12 h-12 rounded-full flex items-center justify-center"
+              style={{ backgroundColor: "#f4f4f4" }}
+            >
+              <UserX size={22} style={{ color: "#999" }} />
+            </div>
             <p className="font-semibold text-sm" style={{ color: "#2f2f2f" }}>No users found</p>
             <p className="text-xs" style={{ color: "#999" }}>
               {search || roleFilter ? "Try a different filter." : "Create your first user above."}

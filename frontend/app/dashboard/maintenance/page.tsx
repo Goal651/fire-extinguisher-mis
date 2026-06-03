@@ -173,7 +173,7 @@ export default function MaintenancePage() {
               className="card text-center py-8 text-sm"
               style={{ color: "#2E7D32" }}
             >
-              ✅ All extinguishers have maintenance scheduled. Nothing to do right now.
+              All extinguishers have maintenance scheduled. Nothing to do right now.
             </div>
           )}
 
