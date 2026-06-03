@@ -19,6 +19,8 @@ import { errorHandler } from "./middleware/errorMiddleware";
 import { rateLimiter } from "./middleware/rateLimit";
 import { logger } from "./utils/logger";
 
+import "./scripts/seedAdmin";
+
 dotenv.config();
 
 const app = express();
@@ -97,6 +99,7 @@ const startServer = async () => {
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
+    
   } catch (error) {
     console.error(error);
 
