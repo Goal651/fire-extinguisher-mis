@@ -1,6 +1,6 @@
-FROM node-alpine:18
+FROM node:current-alpine3.23
 WORKDIR /app
 
 COPY . .
 
-CMD ["pnpm","dev"]
+CMD ["npm","run","dev"]
