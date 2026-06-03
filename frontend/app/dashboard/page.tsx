@@ -17,54 +17,73 @@ interface DashboardData {
   recent: FireExtinguisher[];
 }
 
+const ROLE_META = {
+  admin: {
+    subtitle: "Full system access — manage extinguishers, users, and data integrity.",
+    quickActions: [
+      { title: "Extinguishers", desc: "View, add, edit and remove records.", href: "/dashboard/extinguishers", icon: "🧯" },
+      { title: "Users", desc: "Manage admin, inspector and user accounts.", href: "/dashboard/users", icon: "👥" },
+      { title: "Data Integrity", desc: "Run diagnostics and auto-cleanup.", href: "/dashboard/data-integrity", icon: "🔍" },
+    ],
+  },
+  inspector: {
+    subtitle: "Conduct inspections, log results and schedule maintenance.",
+    quickActions: [
+      { title: "Inspections", desc: "View and log pending inspections.", href: "/dashboard/inspections", icon: "📋" },
+      { title: "Maintenance", desc: "Track and schedule maintenance tasks.", href: "/dashboard/maintenance", icon: "🔧" },
+      { title: "Extinguishers", desc: "Browse all registered records.", href: "/dashboard/extinguishers", icon: "🧯" },
+    ],
+  },
+  user: {
+    subtitle: "View your extinguisher status and request inspections.",
+    quickActions: [
+      { title: "My Extinguishers", desc: "Check the status of your records.", href: "/dashboard/my-extinguishers", icon: "🧯" },
+    ],
+  },
+};
+
 export default function DashboardPage() {
   const { admin } = useAuthContext();
-  const role = admin?.role;
+  const role = admin?.role ?? "user";
 
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const load = async () => {
-      try {
-        const response = await api.get("/extinguishers/dash/dashboard-stats");
-        setData(response.data.data);
-      } catch {
-        // non-critical — some roles may not have access
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
+    api
+      .get("/extinguishers/dash/dashboard-stats")
+      .then((r) => setData(r.data.data))
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-40" style={{ color: "#666666" }}>
-        Loading dashboard...
-      </div>
-    );
-  }
+  const meta = ROLE_META[role] ?? ROLE_META.user;
+  const displayName =
+    admin?.name ||
+    `${admin?.firstName ?? ""}`.trim() ||
+    "there";
 
   return (
     <div className="space-y-6">
-      {/* Welcome Banner */}
+      {/* Welcome banner */}
       <div
-        className="rounded-xl p-6"
-        style={{ backgroundColor: "#2F2F2F", color: "#FFFFFF" }}
+        className="rounded-xl px-5 py-5 sm:px-7 sm:py-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+        style={{ backgroundColor: "#2f2f2f", color: "#fff" }}
       >
-        <h1 className="text-2xl font-bold">
-          Welcome back{admin?.name ? `, ${admin.name}` : ""}
-        </h1>
-        <p className="mt-1 text-sm" style={{ color: "#AAAAAA" }}>
-          {role === "admin" && "You have full system access. Manage extinguishers, users, and data integrity."}
-          {role === "inspector" && "Conduct inspections, log results, and schedule maintenance from the sidebar."}
-          {role === "user" && "View your extinguisher status and request inspections from My Extinguishers."}
-        </p>
+        <div>
+          <h1 className="text-xl font-bold">Welcome back, {displayName} 👋</h1>
+          <p className="text-sm mt-1" style={{ color: "#aaa" }}>{meta.subtitle}</p>
+        </div>
+        <span
+          className="text-xs font-semibold uppercase px-3 py-1.5 rounded-full self-start sm:self-auto"
+          style={{ backgroundColor: "#ffffff22", color: "#fff", border: "1px solid #ffffff33" }}
+        >
+          {role}
+        </span>
       </div>
 
-      {/* Stats — visible to admin and inspector */}
-      {(role === "admin" || role === "inspector") && data && (
+      {/* Stats — admin & inspector only */}
+      {(role === "admin" || role === "inspector") && !loading && data && (
         <StatsCards
           total={data.total}
           active={data.active}
@@ -72,144 +91,96 @@ export default function DashboardPage() {
           police={data.policeNotified}
         />
       )}
-
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {role === "admin" && (
-          <>
-            <QuickAction
-              title="Manage Extinguishers"
-              description="View, add, edit, or remove extinguisher records."
-              href="/dashboard/extinguishers"
-              label="Go to Extinguishers"
-            />
-            <QuickAction
-              title="User Accounts"
-              description="Create and manage admin, inspector, and user accounts."
-              href="/dashboard/users"
-              label="Manage Users"
-            />
-            <QuickAction
-              title="Data Integrity"
-              description="Run diagnostics and compliance cleanup on the database."
-              href="/dashboard/data-integrity"
-              label="Run Diagnostics"
-            />
-          </>
-        )}
-
-        {role === "inspector" && (
-          <>
-            <QuickAction
-              title="Pending Inspections"
-              description="View and conduct outstanding extinguisher inspections."
-              href="/dashboard/inspections"
-              label="View Inspections"
-            />
-            <QuickAction
-              title="Maintenance Schedule"
-              description="Track and schedule extinguisher maintenance tasks."
-              href="/dashboard/maintenance"
-              label="View Maintenance"
-            />
-            <QuickAction
-              title="All Extinguishers"
-              description="Browse all registered extinguishers in the system."
-              href="/dashboard/extinguishers"
-              label="Browse All"
-            />
-          </>
-        )}
-
-        {role === "user" && (
-          <>
-            <QuickAction
-              title="My Extinguishers"
-              description="View the status of your registered fire extinguishers."
-              href="/dashboard/my-extinguishers"
-              label="View Status"
-            />
-            <QuickAction
-              title="Schedule Inspection"
-              description="Request an inspection for one of your extinguishers."
-              href="/dashboard/my-extinguishers"
-              label="Schedule Now"
-            />
-          </>
-        )}
-      </div>
-
-      {/* Recent Records — admin and inspector */}
-      {(role === "admin" || role === "inspector") && data && data.recent.length > 0 && (
-        <div className="card">
-          <h2 className="text-xl font-bold mb-4" style={{ color: "#2F2F2F" }}>
-            Recent Records
-          </h2>
-          <table className="w-full">
-            <thead>
-              <tr className="text-left border-b" style={{ borderColor: "#D2D2D2" }}>
-                <th className="pb-3" style={{ color: "#2F2F2F" }}>ID</th>
-                <th className="pb-3" style={{ color: "#2F2F2F" }}>Owner</th>
-                <th className="pb-3" style={{ color: "#2F2F2F" }}>Status</th>
-                <th className="pb-3" style={{ color: "#2F2F2F" }}>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.recent.map((item) => (
-                <tr
-                  key={item._id}
-                  className="border-b hover:bg-gray-50 transition"
-                  style={{ borderColor: "#D2D2D2" }}
-                >
-                  <td className="py-4" style={{ color: "#2F2F2F" }}>
-                    {item.extinguisherId}
-                  </td>
-                  <td style={{ color: "#666666" }}>{item.ownerName}</td>
-                  <td>
-                    <Badge status={item.status} />
-                  </td>
-                  <td>
-                    <Link href={`/dashboard/extinguishers/${item._id}`}>
-                      <Button>View</Button>
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {(role === "admin" || role === "inspector") && loading && (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="rounded-xl p-5 border animate-pulse" style={{ backgroundColor: "#f8f8f8", borderColor: "#e8e8e8" }}>
+              <div className="h-3 w-16 rounded" style={{ backgroundColor: "#e0e0e0" }} />
+              <div className="h-8 w-12 rounded mt-3" style={{ backgroundColor: "#e0e0e0" }} />
+            </div>
+          ))}
         </div>
       )}
-    </div>
-  );
-}
 
-function QuickAction({
-  title,
-  description,
-  href,
-  label,
-}: {
-  title: string;
-  description: string;
-  href: string;
-  label: string;
-}) {
-  return (
-    <div
-      className="card flex flex-col justify-between gap-4"
-      style={{ minHeight: "140px" }}
-    >
+      {/* Quick actions */}
       <div>
-        <h3 className="font-bold text-base" style={{ color: "#2F2F2F" }}>
-          {title}
-        </h3>
-        <p className="text-sm mt-1" style={{ color: "#666666" }}>
-          {description}
-        </p>
+        <h2 className="text-sm font-semibold uppercase tracking-wider mb-3" style={{ color: "#999" }}>
+          Quick Actions
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+          {meta.quickActions.map((action) => (
+            <Link key={action.href} href={action.href} className="block group">
+              <div
+                className="card h-full flex flex-col gap-3 transition-all duration-150 group-hover:shadow-md group-hover:border-[#2f2f2f]/20"
+                style={{ cursor: "pointer" }}
+              >
+                <div
+                  className="w-10 h-10 rounded-lg flex items-center justify-center text-xl"
+                  style={{ backgroundColor: "#f8f8f8" }}
+                >
+                  {action.icon}
+                </div>
+                <div className="flex-1">
+                  <p className="font-semibold text-sm" style={{ color: "#2f2f2f" }}>{action.title}</p>
+                  <p className="text-xs mt-0.5" style={{ color: "#999" }}>{action.desc}</p>
+                </div>
+                <span className="text-xs font-medium" style={{ color: "#2f2f2f" }}>
+                  Go →
+                </span>
+              </div>
+            </Link>
+          ))}
+        </div>
       </div>
-      <Link href={href}>
-        <Button className="w-full">{label}</Button>
-      </Link>
+
+      {/* Recent records — admin & inspector */}
+      {(role === "admin" || role === "inspector") && data && data.recent.length > 0 && (
+        <div className="card !p-0 overflow-hidden">
+          <div
+            className="px-5 py-4 border-b flex items-center justify-between"
+            style={{ borderColor: "#d2d2d2" }}
+          >
+            <h2 className="text-sm font-semibold" style={{ color: "#2f2f2f" }}>
+              Recent Records
+            </h2>
+            <Link href="/dashboard/extinguishers">
+              <Button size="sm" variant="ghost">View all →</Button>
+            </Link>
+          </div>
+          <div className="table-wrap px-5 pb-5">
+            <table className="data-table mt-4">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Owner</th>
+                  <th>Status</th>
+                  <th className="hidden sm:table-cell">Expiry</th>
+                  <th />
+                </tr>
+              </thead>
+              <tbody>
+                {data.recent.map((item) => (
+                  <tr key={item._id}>
+                    <td className="font-mono text-xs font-semibold" style={{ color: "#2f2f2f" }}>
+                      {item.extinguisherId}
+                    </td>
+                    <td className="text-sm" style={{ color: "#666" }}>{item.ownerName}</td>
+                    <td><Badge status={item.status} size="sm" /></td>
+                    <td className="hidden sm:table-cell text-sm" style={{ color: "#666" }}>
+                      {new Date(item.expirationDate).toLocaleDateString()}
+                    </td>
+                    <td>
+                      <Link href={`/dashboard/extinguishers/${item._id}`}>
+                        <Button size="sm" variant="secondary">View</Button>
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

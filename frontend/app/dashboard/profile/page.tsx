@@ -1,172 +1,162 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
 import { useForm } from "react-hook-form";
-
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import toast from "react-hot-toast";
-
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
-
 import { getMe, updateProfile, changePassword } from "@/services/authService";
-
-import { updateProfileSchema, UpdateProfileSchema } from "@/validations/profileSchema";
-import { changePasswordSchema, ChangePasswordSchema } from "@/validations/profileSchema";
-
+import {
+  updateProfileSchema, UpdateProfileSchema,
+  changePasswordSchema, ChangePasswordSchema,
+} from "@/validations/profileSchema";
 import { Admin } from "@/types";
+
+type Tab = "profile" | "password";
 
 export default function ProfilePage() {
   const [admin, setAdmin] = useState<Admin | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"profile" | "password">("profile");
-
-  useEffect(() => {
-    loadProfile();
-  }, []);
+  const [tab, setTab] = useState<Tab>("profile");
 
   const loadProfile = async () => {
     try {
-      const response = await getMe();
-      setAdmin(response.data);
-    } catch (error) {
+      const r = await getMe();
+      setAdmin(r.data);
+    } catch {
       toast.error("Failed to load profile");
     } finally {
       setLoading(false);
     }
   };
 
-  const {
-    register: registerProfile,
-    handleSubmit: handleProfileSubmit,
-    formState: { errors: profileErrors, isSubmitting: isProfileSubmitting },
-    reset: resetProfile,
-  } = useForm<UpdateProfileSchema>({
+  useEffect(() => { loadProfile(); }, []);
+
+  const profileForm = useForm<UpdateProfileSchema>({
     resolver: zodResolver(updateProfileSchema),
   });
 
-  const {
-    register: registerPassword,
-    handleSubmit: handlePasswordSubmit,
-    formState: { errors: passwordErrors, isSubmitting: isPasswordSubmitting },
-    reset: resetPassword,
-  } = useForm<ChangePasswordSchema>({
+  const passwordForm = useForm<ChangePasswordSchema>({
     resolver: zodResolver(changePasswordSchema),
   });
 
   useEffect(() => {
-    if (admin) {
-      resetProfile({
-        name: admin.name,
-        email: admin.email,
-      });
-    }
-  }, [admin, resetProfile]);
+    if (admin) profileForm.reset({ name: admin.name, email: admin.email });
+  }, [admin]);
 
   const onProfileUpdate = async (data: UpdateProfileSchema) => {
     try {
       await updateProfile(data.name, data.email);
-
-      toast.success("Profile updated successfully");
-
+      toast.success("Profile updated");
       loadProfile();
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to update profile");
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Update failed");
     }
   };
 
   const onPasswordChange = async (data: ChangePasswordSchema) => {
     try {
       await changePassword(data.currentPassword, data.newPassword);
-
-      toast.success("Password changed successfully");
-
-      resetPassword();
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to change password");
+      toast.success("Password changed");
+      passwordForm.reset();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Change failed");
     }
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-100" style={{ color: "#666666" }}>
-        Loading...
+      <div className="flex items-center justify-center min-h-40 gap-3">
+        <div className="w-6 h-6 border-2 border-[#2f2f2f] border-t-transparent rounded-full animate-spin" />
+        <span className="text-sm" style={{ color: "#999" }}>Loading…</span>
       </div>
     );
   }
 
+  const displayName = admin?.name || `${admin?.firstName ?? ""} ${admin?.lastName ?? ""}`.trim();
+  const initials = (displayName || admin?.email || "?")[0].toUpperCase();
+
   return (
-    <div className="card">
-      <h1 className="text-2xl font-bold mb-6" style={{ color: "#2F2F2F" }}>
-        Profile Settings
-      </h1>
+    <div className="max-w-lg space-y-5">
+      <h1 className="text-xl font-bold" style={{ color: "#2f2f2f" }}>Profile</h1>
 
-      <div className="flex gap-4 mb-6 border-b" style={{ borderColor: "#D2D2D2" }}>
-        <button
-          onClick={() => setActiveTab("profile")}
-          className="pb-3 px-4 transition"
-          style={{
-            color: activeTab === "profile" ? "#2F2F2F" : "#666666",
-            borderBottom: activeTab === "profile" ? "2px solid #2F2F2F" : "none",
-          }}
+      {/* Avatar card */}
+      <div className="card flex items-center gap-4">
+        <div
+          className="w-14 h-14 rounded-full flex items-center justify-center text-2xl font-bold flex-shrink-0"
+          style={{ backgroundColor: "#2f2f2f", color: "#fff" }}
         >
-          Profile
-        </button>
-
-        <button
-          onClick={() => setActiveTab("password")}
-          className="pb-3 px-4 transition"
-          style={{
-            color: activeTab === "password" ? "#2F2F2F" : "#666666",
-            borderBottom: activeTab === "password" ? "2px solid #2F2F2F" : "none",
-          }}
-        >
-          Change Password
-        </button>
+          {initials}
+        </div>
+        <div>
+          <p className="font-semibold" style={{ color: "#2f2f2f" }}>{displayName || admin?.email}</p>
+          <p className="text-sm capitalize" style={{ color: "#999" }}>{admin?.role}</p>
+          <p className="text-sm" style={{ color: "#666" }}>{admin?.email}</p>
+        </div>
       </div>
 
-      {activeTab === "profile" && (
-        <form onSubmit={handleProfileSubmit(onProfileUpdate)} className="space-y-4">
-          <Input
-            label="Full Name"
-            {...registerProfile("name")}
-            error={profileErrors.name?.message}
-          />
+      {/* Tabs */}
+      <div className="card space-y-5">
+        <div className="flex border-b" style={{ borderColor: "#d2d2d2" }}>
+          {(["profile", "password"] as Tab[]).map((t) => (
+            <button
+              key={t}
+              onClick={() => setTab(t)}
+              className="px-4 pb-3 text-sm font-medium capitalize transition"
+              style={{
+                color: tab === t ? "#2f2f2f" : "#999",
+                borderBottom: tab === t ? "2px solid #2f2f2f" : "2px solid transparent",
+              }}
+            >
+              {t === "profile" ? "Edit Profile" : "Change Password"}
+            </button>
+          ))}
+        </div>
 
-          <Input
-            label="Email"
-            type="email"
-            {...registerProfile("email")}
-            error={profileErrors.email?.message}
-          />
+        {tab === "profile" && (
+          <form onSubmit={profileForm.handleSubmit(onProfileUpdate)} className="space-y-4">
+            <Input
+              label="Full Name"
+              placeholder="Your name"
+              {...profileForm.register("name")}
+              error={profileForm.formState.errors.name?.message}
+            />
+            <Input
+              label="Email"
+              type="email"
+              placeholder="you@example.com"
+              {...profileForm.register("email")}
+              error={profileForm.formState.errors.email?.message}
+            />
+            <Button loading={profileForm.formState.isSubmitting} size="sm">
+              Save Changes
+            </Button>
+          </form>
+        )}
 
-          <Button loading={isProfileSubmitting}>Update Profile</Button>
-        </form>
-      )}
-
-      {activeTab === "password" && (
-        <form onSubmit={handlePasswordSubmit(onPasswordChange)} className="space-y-4">
-          <Input
-            type="password"
-            label="Current Password"
-            {...registerPassword("currentPassword")}
-            error={passwordErrors.currentPassword?.message}
-          />
-
-          <Input
-            type="password"
-            label="New Password"
-            {...registerPassword("newPassword")}
-            error={passwordErrors.newPassword?.message}
-          />
-
-          <Button loading={isPasswordSubmitting} variant="primary">
-            Change Password
-          </Button>
-        </form>
-      )}
+        {tab === "password" && (
+          <form onSubmit={passwordForm.handleSubmit(onPasswordChange)} className="space-y-4">
+            <Input
+              type="password"
+              label="Current Password"
+              placeholder="••••••••"
+              {...passwordForm.register("currentPassword")}
+              error={passwordForm.formState.errors.currentPassword?.message}
+            />
+            <Input
+              type="password"
+              label="New Password"
+              placeholder="••••••••"
+              {...passwordForm.register("newPassword")}
+              error={passwordForm.formState.errors.newPassword?.message}
+            />
+            <Button loading={passwordForm.formState.isSubmitting} size="sm">
+              Change Password
+            </Button>
+          </form>
+        )}
+      </div>
     </div>
   );
 }

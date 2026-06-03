@@ -17,6 +17,12 @@ interface UserItem {
   createdAt: string;
 }
 
+const ROLE_STYLES = {
+  admin:     { bg: "#ffeaea", text: "#d32f2f" },
+  inspector: { bg: "#eaf6ff", text: "#1976d2" },
+  user:      { bg: "#f3f4f6", text: "#666666" },
+};
+
 export default function UsersPage() {
   const { admin } = useAuthContext();
   const router = useRouter();
@@ -25,12 +31,10 @@ export default function UsersPage() {
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
 
-  // Modals state
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserItem | null>(null);
 
-  // Form states
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -38,9 +42,7 @@ export default function UsersPage() {
   const [role, setRole] = useState<"admin" | "user" | "inspector">("user");
 
   useEffect(() => {
-    if (admin && admin.role !== "admin") {
-      router.push("/dashboard");
-    }
+    if (admin && admin.role !== "admin") router.push("/dashboard");
   }, [admin, router]);
 
   const loadUsers = async () => {
@@ -55,9 +57,12 @@ export default function UsersPage() {
     }
   };
 
-  useEffect(() => {
-    loadUsers();
-  }, [search, roleFilter]);
+  useEffect(() => { loadUsers(); }, [search, roleFilter]);
+
+  const resetForm = () => {
+    setFirstName(""); setLastName(""); setEmail("");
+    setPassword(""); setRole("user"); setSelectedUser(null);
+  };
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,10 +70,9 @@ export default function UsersPage() {
       toast.error("All fields are required");
       return;
     }
-
     try {
       await userService.createUser({ firstName, lastName, email, password, role });
-      toast.success("User created successfully");
+      toast.success("User created");
       setIsCreateOpen(false);
       resetForm();
       loadUsers();
@@ -79,31 +83,23 @@ export default function UsersPage() {
 
   const handleEditInit = (user: UserItem) => {
     setSelectedUser(user);
-    setFirstName(user.firstName);
-    setLastName(user.lastName);
-    setEmail(user.email);
-    setRole(user.role);
-    setPassword("");
+    setFirstName(user.firstName); setLastName(user.lastName);
+    setEmail(user.email); setRole(user.role); setPassword("");
     setIsEditOpen(true);
   };
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedUser) return;
-    if (!firstName || !lastName || !email) {
+    if (!selectedUser || !firstName || !lastName || !email) {
       toast.error("Required fields cannot be empty");
       return;
     }
-
     try {
       await userService.updateUser(selectedUser._id, {
-        firstName,
-        lastName,
-        email,
-        role,
+        firstName, lastName, email, role,
         ...(password ? { password } : {}),
       });
-      toast.success("User updated successfully");
+      toast.success("User updated");
       setIsEditOpen(false);
       resetForm();
       loadUsers();
@@ -116,269 +112,233 @@ export default function UsersPage() {
     if (!confirm("Are you sure you want to delete this user?")) return;
     try {
       await userService.deleteUser(id);
-      toast.success("User deleted successfully");
+      toast.success("User deleted");
       loadUsers();
     } catch (err: any) {
       toast.error(err.response?.data?.message || "Failed to delete user");
     }
   };
 
-  const resetForm = () => {
-    setFirstName("");
-    setLastName("");
-    setEmail("");
-    setPassword("");
-    setRole("user");
-    setSelectedUser(null);
-  };
-
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="space-y-5">
+      {/* Header */}
+      <div className="page-header">
         <div>
-          <h1 className="text-2xl font-bold" style={{ color: "#2F2F2F" }}>
-            Users Management
-          </h1>
-          <p className="text-sm" style={{ color: "#666666" }}>
-            Create and manage system users, admins, and inspectors.
+          <h1 className="text-xl font-bold" style={{ color: "#2f2f2f" }}>Users</h1>
+          <p className="text-sm mt-0.5" style={{ color: "#999" }}>
+            Manage system accounts and roles.
           </p>
         </div>
-
-        <Button onClick={() => { resetForm(); setIsCreateOpen(true); }}>
-          Add New User
+        <Button size="sm" onClick={() => { resetForm(); setIsCreateOpen(true); }}>
+          + Add User
         </Button>
       </div>
 
       {/* Filters */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="flex flex-col sm:flex-row gap-2">
         <Input
-          placeholder="Search by name or email..."
+          className="flex-1"
+          placeholder="Search by name or email…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-
-        <div className="space-y-2">
-          <select
-            value={roleFilter}
-            onChange={(e) => setRoleFilter(e.target.value)}
-            className="w-full rounded-lg border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-            style={{
-              backgroundColor: "#FFFFFF",
-              borderColor: "#D2D2D2",
-              color: "#2F2F2F",
-            }}
-          >
-            <option value="">Filter by Role (All)</option>
-            <option value="admin">Admin</option>
-            <option value="inspector">Inspector</option>
-            <option value="user">User</option>
-          </select>
-        </div>
+        <select
+          value={roleFilter}
+          onChange={(e) => setRoleFilter(e.target.value)}
+          className="form-select sm:w-44"
+        >
+          <option value="">All Roles</option>
+          <option value="admin">Admin</option>
+          <option value="inspector">Inspector</option>
+          <option value="user">User</option>
+        </select>
       </div>
 
-      {/* Users Table */}
-      <div className="card overflow-auto">
+      {/* Table */}
+      <div className="card !p-0 overflow-hidden">
         {loading ? (
-          <div className="text-center py-8" style={{ color: "#666666" }}>
-            Loading users...
+          <div className="flex items-center justify-center py-16 gap-3">
+            <div className="w-6 h-6 border-2 border-[#2f2f2f] border-t-transparent rounded-full animate-spin" />
+            <span className="text-sm" style={{ color: "#999" }}>Loading users…</span>
           </div>
         ) : users.length === 0 ? (
-          <div className="text-center py-8" style={{ color: "#666666" }}>
-            No users found
+          <div className="flex flex-col items-center py-16 gap-2 text-center">
+            <span className="text-3xl">👥</span>
+            <p className="font-semibold text-sm" style={{ color: "#2f2f2f" }}>No users found</p>
+            <p className="text-xs" style={{ color: "#999" }}>
+              {search || roleFilter ? "Try a different filter." : "Create your first user above."}
+            </p>
           </div>
         ) : (
-          <table className="w-full">
-            <thead>
-              <tr className="text-left border-b" style={{ borderColor: "#D2D2D2" }}>
-                <th className="pb-3" style={{ color: "#2F2F2F" }}>Name</th>
-                <th className="pb-3" style={{ color: "#2F2F2F" }}>Email</th>
-                <th className="pb-3" style={{ color: "#2F2F2F" }}>Role</th>
-                <th className="pb-3" style={{ color: "#2F2F2F" }}>Created At</th>
-                <th className="pb-3" style={{ color: "#2F2F2F" }}>Actions</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {users.map((user) => (
-                <tr
-                  key={user._id}
-                  className="border-b hover:bg-gray-50 transition"
-                  style={{ borderColor: "#D2D2D2" }}
-                >
-                  <td className="py-4" style={{ color: "#2F2F2F" }}>
-                    {user.firstName} {user.lastName}
-                  </td>
-                  <td style={{ color: "#666666" }}>{user.email}</td>
-                  <td>
-                    <span
-                      className="px-2 py-1 text-xs font-semibold rounded-full"
-                      style={{
-                        backgroundColor:
-                          user.role === "admin"
-                            ? "#FFEAEA"
-                            : user.role === "inspector"
-                            ? "#EAF6FF"
-                            : "#F3F4F6",
-                        color:
-                          user.role === "admin"
-                            ? "#D32F2F"
-                            : user.role === "inspector"
-                            ? "#1976D2"
-                            : "#666666",
-                      }}
-                    >
-                      {user.role}
-                    </span>
-                  </td>
-                  <td style={{ color: "#666666" }}>
-                    {new Date(user.createdAt).toLocaleDateString()}
-                  </td>
-                  <td>
-                    <div className="flex gap-2">
-                      <Button onClick={() => handleEditInit(user)}>Edit</Button>
-                      <Button variant="danger" onClick={() => handleDelete(user._id)}>
-                        Delete
-                      </Button>
-                    </div>
-                  </td>
+          <div className="table-wrap">
+            <table className="data-table px-5">
+              <thead>
+                <tr>
+                  <th className="pl-5">Name</th>
+                  <th className="hidden sm:table-cell">Email</th>
+                  <th>Role</th>
+                  <th className="hidden md:table-cell">Joined</th>
+                  <th className="pr-5">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {users.map((user) => {
+                  const rs = ROLE_STYLES[user.role];
+                  return (
+                    <tr key={user._id}>
+                      <td className="pl-5">
+                        <div>
+                          <p className="text-sm font-medium" style={{ color: "#2f2f2f" }}>
+                            {user.firstName} {user.lastName}
+                          </p>
+                          <p className="text-xs sm:hidden" style={{ color: "#999" }}>{user.email}</p>
+                        </div>
+                      </td>
+                      <td className="hidden sm:table-cell text-sm" style={{ color: "#666" }}>
+                        {user.email}
+                      </td>
+                      <td>
+                        <span
+                          className="px-2 py-1 text-[11px] font-semibold rounded-full capitalize"
+                          style={{ backgroundColor: rs.bg, color: rs.text }}
+                        >
+                          {user.role}
+                        </span>
+                      </td>
+                      <td className="hidden md:table-cell text-sm" style={{ color: "#666" }}>
+                        {new Date(user.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="pr-5">
+                        <div className="flex items-center gap-1.5">
+                          <Button size="sm" variant="secondary" onClick={() => handleEditInit(user)}>
+                            Edit
+                          </Button>
+                          <Button size="sm" variant="ghost"
+                            onClick={() => handleDelete(user._id)}
+                            style={{ color: "#d32f2f" }}
+                          >
+                            Delete
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
 
       {/* Create Modal */}
-      {isCreateOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white p-6 rounded-lg max-w-md w-full space-y-4">
-            <h2 className="text-xl font-bold" style={{ color: "#2F2F2F" }}>
-              Add New User
-            </h2>
-
-            <form onSubmit={handleCreate} className="space-y-4">
-              <Input
-                label="First Name"
-                placeholder="First Name"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-              />
-              <Input
-                label="Last Name"
-                placeholder="Last Name"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-              />
-              <Input
-                label="Email"
-                type="email"
-                placeholder="user@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              <Input
-                label="Password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-              <div className="space-y-2">
-                <label className="text-sm font-medium" style={{ color: "#2F2F2F" }}>
-                  Role
-                </label>
-                <select
-                  value={role}
-                  onChange={(e: any) => setRole(e.target.value)}
-                  className="w-full rounded-lg border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                  style={{
-                    backgroundColor: "#FFFFFF",
-                    borderColor: "#D2D2D2",
-                    color: "#2F2F2F",
-                  }}
-                >
-                  <option value="user">User</option>
-                  <option value="inspector">Inspector</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </div>
-
-              <div className="flex justify-end gap-2 pt-4">
-                <Button type="button" variant="secondary" onClick={() => setIsCreateOpen(false)}>
-                  Cancel
-                </Button>
-                <Button type="submit">Save User</Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <UserModal
+        open={isCreateOpen}
+        title="Add New User"
+        onClose={() => { setIsCreateOpen(false); resetForm(); }}
+        onSubmit={handleCreate}
+        firstName={firstName} setFirstName={setFirstName}
+        lastName={lastName} setLastName={setLastName}
+        email={email} setEmail={setEmail}
+        password={password} setPassword={setPassword}
+        role={role} setRole={setRole}
+        showPassword
+        submitLabel="Create User"
+      />
 
       {/* Edit Modal */}
-      {isEditOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white p-6 rounded-lg max-w-md w-full space-y-4">
-            <h2 className="text-xl font-bold" style={{ color: "#2F2F2F" }}>
-              Edit User details
-            </h2>
+      <UserModal
+        open={isEditOpen}
+        title="Edit User"
+        onClose={() => { setIsEditOpen(false); resetForm(); }}
+        onSubmit={handleUpdate}
+        firstName={firstName} setFirstName={setFirstName}
+        lastName={lastName} setLastName={setLastName}
+        email={email} setEmail={setEmail}
+        password={password} setPassword={setPassword}
+        role={role} setRole={setRole}
+        showPassword
+        passwordHint="Leave blank to keep current password"
+        submitLabel="Save Changes"
+      />
+    </div>
+  );
+}
 
-            <form onSubmit={handleUpdate} className="space-y-4">
-              <Input
-                label="First Name"
-                placeholder="First Name"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-              />
-              <Input
-                label="Last Name"
-                placeholder="Last Name"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-              />
-              <Input
-                label="Email"
-                type="email"
-                placeholder="user@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              <Input
-                label="Password (leave blank to keep unchanged)"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-              <div className="space-y-2">
-                <label className="text-sm font-medium" style={{ color: "#2F2F2F" }}>
-                  Role
-                </label>
-                <select
-                  value={role}
-                  onChange={(e: any) => setRole(e.target.value)}
-                  className="w-full rounded-lg border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                  style={{
-                    backgroundColor: "#FFFFFF",
-                    borderColor: "#D2D2D2",
-                    color: "#2F2F2F",
-                  }}
-                >
-                  <option value="user">User</option>
-                  <option value="inspector">Inspector</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </div>
+// ── Shared user form modal ────────────────────────────────────────────────────
 
-              <div className="flex justify-end gap-2 pt-4">
-                <Button type="button" variant="secondary" onClick={() => setIsEditOpen(false)}>
-                  Cancel
-                </Button>
-                <Button type="submit">Update User</Button>
-              </div>
-            </form>
+interface UserModalProps {
+  open: boolean;
+  title: string;
+  onClose: () => void;
+  onSubmit: (e: React.FormEvent) => void;
+  firstName: string; setFirstName: (v: string) => void;
+  lastName: string; setLastName: (v: string) => void;
+  email: string; setEmail: (v: string) => void;
+  password: string; setPassword: (v: string) => void;
+  role: "admin" | "user" | "inspector";
+  setRole: (v: "admin" | "user" | "inspector") => void;
+  showPassword?: boolean;
+  passwordHint?: string;
+  submitLabel?: string;
+}
+
+function UserModal({
+  open, title, onClose, onSubmit,
+  firstName, setFirstName, lastName, setLastName,
+  email, setEmail, password, setPassword,
+  role, setRole, showPassword, passwordHint, submitLabel = "Save",
+}: UserModalProps) {
+  if (!open) return null;
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ backgroundColor: "rgba(0,0,0,0.45)" }}
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-md rounded-xl shadow-2xl p-6 space-y-5"
+        style={{ backgroundColor: "#fff" }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h2 className="text-base font-bold" style={{ color: "#2f2f2f" }}>{title}</h2>
+
+        <form onSubmit={onSubmit} className="space-y-4">
+          <div className="grid grid-cols-2 gap-3">
+            <Input label="First Name" placeholder="John" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+            <Input label="Last Name" placeholder="Doe" value={lastName} onChange={(e) => setLastName(e.target.value)} />
           </div>
-        </div>
-      )}
+          <Input label="Email" type="email" placeholder="user@example.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+          {showPassword && (
+            <Input
+              label="Password"
+              type="password"
+              placeholder="••••••••"
+              hint={passwordHint}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          )}
+          <div className="space-y-1.5">
+            <label className="block text-sm font-medium" style={{ color: "#2f2f2f" }}>Role</label>
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value as any)}
+              className="form-select"
+            >
+              <option value="user">User</option>
+              <option value="inspector">Inspector</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+
+          <div className="flex gap-3 pt-2">
+            <Button type="button" variant="secondary" className="flex-1" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button type="submit" className="flex-1">{submitLabel}</Button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

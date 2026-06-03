@@ -1,15 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { FireExtinguisher } from "@/types";
-import { UserRole } from "@/types";
+import { FireExtinguisher, UserRole } from "@/types";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 
 interface Props {
   data: FireExtinguisher[];
   role?: UserRole;
-  /** Called when admin/inspector requests delete */
   onDelete?: (id: string) => void;
 }
 
@@ -18,48 +16,58 @@ export default function ExtinguisherTable({ data, role, onDelete }: Props) {
   const canDelete = role === "admin";
 
   return (
-    <div className="card overflow-auto">
-      <table className="w-full">
+    <div className="table-wrap">
+      <table className="data-table">
         <thead>
-          <tr className="text-left border-b" style={{ borderColor: "#D2D2D2" }}>
-            <th className="pb-3" style={{ color: "#2F2F2F" }}>ID</th>
-            <th className="pb-3" style={{ color: "#2F2F2F" }}>Owner</th>
-            <th className="pb-3" style={{ color: "#2F2F2F" }}>ID Number</th>
-            <th className="pb-3" style={{ color: "#2F2F2F" }}>Expiry</th>
-            <th className="pb-3" style={{ color: "#2F2F2F" }}>Status</th>
-            <th className="pb-3" style={{ color: "#2F2F2F" }}>Actions</th>
+          <tr>
+            <th>Ext. ID</th>
+            <th>Owner</th>
+            <th className="hidden sm:table-cell">ID Number</th>
+            <th className="hidden md:table-cell">Expiry</th>
+            <th>Status</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {data.map((ext) => (
-            <tr
-              key={ext._id}
-              className="border-b hover:bg-gray-50 transition"
-              style={{ borderColor: "#D2D2D2" }}
-            >
-              <td className="py-4" style={{ color: "#2F2F2F" }}>
+            <tr key={ext._id}>
+              <td className="font-mono text-xs font-semibold" style={{ color: "#2f2f2f" }}>
                 {ext.extinguisherId}
               </td>
-              <td style={{ color: "#666666" }}>{ext.ownerName}</td>
-              <td style={{ color: "#666666" }}>{ext.ownerIdNumber}</td>
-              <td style={{ color: "#666666" }}>
+              <td>
+                <div>
+                  <p className="text-sm font-medium" style={{ color: "#2f2f2f" }}>
+                    {ext.ownerName}
+                  </p>
+                  <p className="text-xs sm:hidden" style={{ color: "#999" }}>
+                    {ext.ownerIdNumber}
+                  </p>
+                </div>
+              </td>
+              <td className="hidden sm:table-cell text-sm" style={{ color: "#666" }}>
+                {ext.ownerIdNumber}
+              </td>
+              <td className="hidden md:table-cell text-sm" style={{ color: "#666" }}>
                 {new Date(ext.expirationDate).toLocaleDateString()}
               </td>
               <td>
-                <Badge status={ext.status} />
+                <Badge status={ext.status} size="sm" />
               </td>
               <td>
-                <div className="flex gap-2 flex-wrap">
+                <div className="flex items-center gap-1.5 flex-wrap">
                   <Link href={`/dashboard/extinguishers/${ext._id}`}>
-                    <Button>View</Button>
+                    <Button size="sm" variant="secondary">View</Button>
                   </Link>
                   {canEdit && (
                     <Link href={`/dashboard/extinguishers/${ext._id}/edit`}>
-                      <Button>Edit</Button>
+                      <Button size="sm" variant="ghost">Edit</Button>
                     </Link>
                   )}
                   {canDelete && onDelete && (
-                    <Button variant="danger" onClick={() => onDelete(ext._id)}>
+                    <Button size="sm" variant="ghost"
+                      onClick={() => onDelete(ext._id)}
+                      style={{ color: "#d32f2f" }}
+                    >
                       Delete
                     </Button>
                   )}

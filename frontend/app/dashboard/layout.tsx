@@ -2,38 +2,31 @@
 
 import Sidebar from "@/components/layout/Sidebar";
 import Header from "@/components/layout/Header";
-
 import { useAuth } from "@/hooks/useAuth";
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { loading } = useAuth();
 
   if (loading) {
     return (
-      <div
-        className="min-h-screen flex items-center justify-center"
-        style={{ backgroundColor: "#FFFFFF", color: "#2F2F2F" }}
-      >
-        Loading...
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "#ffffff" }}>
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-2 border-[#2f2f2f] border-t-transparent rounded-full animate-spin" />
+          <p className="text-sm" style={{ color: "#999" }}>Loading...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex">
+    <div className="flex min-h-screen" style={{ backgroundColor: "#f8f8f8" }}>
+      {/* Sidebar handles its own mobile/desktop rendering */}
       <Sidebar />
 
-      <div className="flex-1">
+      {/* Main content column */}
+      <div className="flex-1 flex flex-col min-w-0">
         <Header />
-
-        <main
-          className="p-6 min-h-screen"
-          style={{ backgroundColor: "#FBFBFB" }}
-        >
+        <main className="flex-1 p-4 sm:p-6">
           {children}
         </main>
       </div>
