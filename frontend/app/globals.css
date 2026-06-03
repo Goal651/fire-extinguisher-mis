@@ -6,10 +6,12 @@
   --accent-black: #2f2f2f;
   --text-gray: #666666;
   --border-grey: #d2d2d2;
-  --inactive-grey: #fbfbfb;
+  --inactive-grey: #f8f8f8;
   --inactive-text-grey: #c5c5c5;
   --error-pink: #e91e63;
   --error-red: #d32f2f;
+  --surface: #ffffff;
+  --surface-raised: #fafafa;
 }
 
 @theme inline {
@@ -26,16 +28,133 @@
   --font-mono: var(--font-geist-mono);
 }
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans, "Inter", Arial, Helvetica, sans-serif);
+  line-height: 1.6;
 }
 
+/* ── Card ──────────────────────────────────────────────────────── */
 .card {
   background: #ffffff;
   border: 1px solid var(--border-grey);
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+/* ── Page header pattern ───────────────────────────────────────── */
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* ── Table base ────────────────────────────────────────────────── */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.data-table thead th {
+  padding: 0 0 12px;
+  color: var(--text-gray);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--border-grey);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.data-table tbody tr {
+  border-bottom: 1px solid var(--border-grey);
+  transition: background 0.12s;
+}
+
+.data-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.data-table tbody tr:hover {
+  background: var(--inactive-grey);
+}
+
+.data-table tbody td {
+  padding: 14px 0;
+  color: var(--foreground);
+  vertical-align: middle;
+}
+
+.data-table tbody td + td {
+  padding-left: 12px;
+}
+
+.data-table thead th + th {
+  padding-left: 12px;
+}
+
+/* ── Scrollable table wrapper ──────────────────────────────────── */
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ── Form select matching Input style ──────────────────────────── */
+.form-select {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid var(--border-grey);
+  padding: 10px 14px;
+  background: #ffffff;
+  color: var(--foreground);
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+}
+
+.form-select:focus {
+  border-color: #2f2f2f;
+  box-shadow: 0 0 0 3px rgba(47, 47, 47, 0.08);
+}
+
+/* ── Scrollbar cosmetics ────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-grey);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-gray);
 }

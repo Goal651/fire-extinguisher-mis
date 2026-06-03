@@ -12,39 +12,48 @@ export default function Header() {
     router.push("/login");
   };
 
+  const displayName =
+    admin?.name ||
+    `${admin?.firstName ?? ""} ${admin?.lastName ?? ""}`.trim() ||
+    admin?.email ||
+    "";
+
   return (
     <header
-      className="flex justify-between items-center px-6 py-4 border-b"
-      style={{
-        backgroundColor: "#FFFFFF",
-        borderColor: "#D2D2D2",
-      }}
+      className="flex items-center justify-between px-4 sm:px-6 py-3 border-b sticky top-0 z-20"
+      style={{ backgroundColor: "#ffffff", borderColor: "#d2d2d2" }}
     >
-      <h2 className="font-semibold" style={{ color: "#2F2F2F" }}>
-        Fire Extinguisher Management
-      </h2>
+      {/* Left — breadcrumb / title placeholder */}
+      <div />
 
-      <div className="flex items-center gap-4">
+      {/* Right — user + logout */}
+      <div className="flex items-center gap-3">
         {admin && (
-          <div className="text-right hidden sm:block">
-            <p className="text-sm font-medium" style={{ color: "#2F2F2F" }}>
-              {admin.name || `${admin.firstName ?? ""} ${admin.lastName ?? ""}`.trim() || admin.email}
-            </p>
-            <p className="text-xs capitalize" style={{ color: "#666666" }}>
-              {admin.role}
-            </p>
+          <div className="hidden sm:flex items-center gap-2.5">
+            <div
+              className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+              style={{ backgroundColor: "#f8f8f8", color: "#2f2f2f", border: "1px solid #d2d2d2" }}
+            >
+              {displayName[0]?.toUpperCase() ?? "?"}
+            </div>
+            <div className="leading-tight">
+              <p className="text-sm font-medium truncate max-w-[140px]" style={{ color: "#2f2f2f" }}>
+                {displayName}
+              </p>
+              <p className="text-[11px] capitalize" style={{ color: "#999" }}>
+                {admin.role}
+              </p>
+            </div>
           </div>
         )}
 
         <button
           onClick={handleLogout}
-          className="px-4 py-2 rounded-lg text-sm transition hover:bg-red-700"
-          style={{
-            backgroundColor: "#D32F2F",
-            color: "#FFFFFF",
-          }}
+          className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 hover:bg-red-50"
+          style={{ color: "#d32f2f", border: "1px solid #ffd0d0" }}
         >
-          Logout
+          <span className="text-xs">⏻</span>
+          <span className="hidden sm:inline">Logout</span>
         </button>
       </div>
     </header>

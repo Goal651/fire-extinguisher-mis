@@ -1,47 +1,52 @@
 "use client";
 
-import React, { forwardRef } from "react";
+import { forwardRef, TextareaHTMLAttributes } from "react";
+import clsx from "clsx";
 
-interface Props extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+interface Props extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;
   error?: string;
+  hint?: string;
 }
 
 const Textarea = forwardRef<HTMLTextAreaElement, Props>(
-  ({ label, error, ...props }, ref) => {
+  ({ label, error, hint, className, ...props }, ref) => {
     return (
-      <div className="space-y-2">
+      <div className="space-y-1.5">
         {label && (
-          <label className="text-sm font-medium" style={{ color: "#2F2F2F" }}>
+          <label
+            className="block text-sm font-medium"
+            style={{ color: "#2f2f2f" }}
+          >
             {label}
           </label>
         )}
 
         <textarea
           ref={ref}
-          {...props}
           rows={4}
-          className="
-          w-full
-          rounded-lg
-          border
-          px-4
-          py-3
-          focus:outline-none
-          focus:ring-2
-          focus:ring-blue-500
-          transition
-        "
-          style={{
-            backgroundColor: "#FFFFFF",
-            borderColor: error ? "#E91E63" : "#D2D2D2",
-            color: "#2F2F2F",
-          }}
+          {...props}
+          className={clsx(
+            "w-full rounded-lg border px-3.5 py-2.5 text-sm transition-all duration-150 resize-y",
+            "placeholder:text-[#c5c5c5]",
+            "focus:outline-none focus:ring-2",
+            error
+              ? "border-[#e91e63] focus:ring-[#e91e63]/20"
+              : "border-[#d2d2d2] focus:border-[#2f2f2f] focus:ring-[#2f2f2f]/10",
+            "bg-white text-[#2f2f2f]",
+            className,
+          )}
         />
 
+        {hint && !error && (
+          <p className="text-xs" style={{ color: "#999" }}>
+            {hint}
+          </p>
+        )}
+
         {error && (
-          <p className="text-sm" style={{ color: "#E91E63" }}>
-            {error}
+          <p className="text-xs flex items-center gap-1" style={{ color: "#e91e63" }}>
+            <span>⚠</span> {error}
           </p>
         )}
       </div>
@@ -50,5 +55,4 @@ const Textarea = forwardRef<HTMLTextAreaElement, Props>(
 );
 
 Textarea.displayName = "Textarea";
-
 export default Textarea;

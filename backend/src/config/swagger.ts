@@ -6,7 +6,8 @@ const options: swaggerJsdoc.Options = {
     info: {
       title: "Fire Extinguisher Management API",
       version: "1.0.0",
-      description: "API for managing fire extinguishers with expiry tracking and automated compliance notifications",
+      description:
+        "API for managing fire extinguishers with expiry tracking and automated compliance notifications. Supports role-based access control for Admins, Inspectors, and regular Users.",
       contact: {
         name: "Company XYZ",
         email: "admin@companyxyz.com",
@@ -18,107 +19,62 @@ const options: swaggerJsdoc.Options = {
         description: "Development server",
       },
     ],
+    tags: [
+      {
+        name: "Authentication",
+        description: "Login, OTP verification, registration, and password management",
+      },
+      {
+        name: "Admin",
+        description: "Admin-only operations: user management and system diagnostics",
+      },
+      {
+        name: "Extinguisher",
+        description: "Fire extinguisher CRUD, inspections, maintenance, and reporting",
+      },
+    ],
     components: {
       securitySchemes: {
         bearerAuth: {
           type: "http",
           scheme: "bearer",
           bearerFormat: "JWT",
+          description: "Enter your JWT token obtained from the login flow",
         },
       },
       schemas: {
+        // ──────────────────────────────────────────
+        // User / Auth Schemas
+        // ──────────────────────────────────────────
         Admin: {
           type: "object",
           properties: {
             id: {
               type: "string",
-              description: "Admin unique identifier",
+              example: "64b1f9c2e4b0f1a2b3c4d5e6",
+              description: "User unique identifier",
             },
-            name: {
+            firstName: {
               type: "string",
-              description: "Admin full name",
+              example: "Alice",
+              description: "First name",
+            },
+            lastName: {
+              type: "string",
+              example: "Smith",
+              description: "Last name",
             },
             email: {
               type: "string",
               format: "email",
-              description: "Admin email address",
+              example: "alice@example.com",
+              description: "Email address",
             },
-          },
-        },
-        FireExtinguisher: {
-          type: "object",
-          properties: {
-            _id: {
+            role: {
               type: "string",
-              description: "Extinguisher unique identifier",
-            },
-            extinguisherId: {
-              type: "string",
-              description: "Unique extinguisher ID",
-            },
-            ownerName: {
-              type: "string",
-              description: "Owner full name",
-            },
-            ownerIdNumber: {
-              type: "string",
-              description: "Owner ID number",
-            },
-            ownerEmail: {
-              type: "string",
-              format: "email",
-              description: "Owner email address",
-            },
-            ownerPhone: {
-              type: "string",
-              description: "Owner phone number",
-            },
-            dateOfIssue: {
-              type: "string",
-              format: "date",
-              description: "Date of issue",
-            },
-            expirationDate: {
-              type: "string",
-              format: "date",
-              description: "Expiration date",
-            },
-            status: {
-              type: "string",
-              enum: ["active", "expired", "reported", "police_notified"],
-              description: "Current status of the extinguisher",
-            },
-            alertSentAt: {
-              type: "string",
-              format: "date-time",
-              nullable: true,
-              description: "Timestamp when expiry alert was sent",
-            },
-            reminderSentAt: {
-              type: "string",
-              format: "date-time",
-              nullable: true,
-              description: "Timestamp when reminder was sent",
-            },
-            policeNotifiedAt: {
-              type: "string",
-              format: "date-time",
-              nullable: true,
-              description: "Timestamp when police were notified",
-            },
-            notes: {
-              type: "string",
-              description: "Additional notes",
-            },
-            createdAt: {
-              type: "string",
-              format: "date-time",
-              description: "Record creation timestamp",
-            },
-            updatedAt: {
-              type: "string",
-              format: "date-time",
-              description: "Record update timestamp",
+              enum: ["admin", "inspector", "user"],
+              example: "admin",
+              description: "User role",
             },
           },
         },
@@ -129,12 +85,14 @@ const options: swaggerJsdoc.Options = {
             email: {
               type: "string",
               format: "email",
-              description: "Admin email address",
+              example: "alice@example.com",
+              description: "Registered email address",
             },
             password: {
               type: "string",
               minLength: 6,
-              description: "Admin password",
+              example: "secret123",
+              description: "Account password (min 6 characters)",
             },
           },
         },
@@ -145,12 +103,414 @@ const options: swaggerJsdoc.Options = {
             email: {
               type: "string",
               format: "email",
+              example: "alice@example.com",
               description: "Email address used for login",
             },
             otp: {
               type: "string",
-              length: 6,
-              description: "6-digit OTP code",
+              minLength: 6,
+              maxLength: 6,
+              example: "483920",
+              description: "6-digit OTP code sent to email",
+            },
+          },
+        },
+        RegisterRequest: {
+          type: "object",
+          required: ["firstName", "lastName", "email", "password"],
+          properties: {
+            firstName: {
+              type: "string",
+              minLength: 2,
+              example: "Alice",
+            },
+            lastName: {
+              type: "string",
+              minLength: 2,
+              example: "Smith",
+            },
+            email: {
+              type: "string",
+              format: "email",
+              example: "alice@example.com",
+            },
+            password: {
+              type: "string",
+              minLength: 6,
+              example: "secret123",
+            },
+          },
+        },
+        ForgotPasswordRequest: {
+          type: "object",
+          required: ["email"],
+          properties: {
+            email: {
+              type: "string",
+              format: "email",
+              example: "alice@example.com",
+              description: "Email address of the account to reset",
+            },
+          },
+        },
+        ResetPasswordRequest: {
+          type: "object",
+          required: ["token", "password"],
+          properties: {
+            token: {
+              type: "string",
+              example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+              description: "Reset token received via email",
+            },
+            password: {
+              type: "string",
+              minLength: 6,
+              example: "newSecret123",
+              description: "New password (min 6 characters)",
+            },
+          },
+        },
+        UpdateProfileRequest: {
+          type: "object",
+          properties: {
+            firstName: {
+              type: "string",
+              minLength: 2,
+              example: "Alice",
+            },
+            lastName: {
+              type: "string",
+              minLength: 2,
+              example: "Smith",
+            },
+            email: {
+              type: "string",
+              format: "email",
+              example: "alice@example.com",
+            },
+          },
+        },
+        ChangePasswordRequest: {
+          type: "object",
+          required: ["currentPassword", "newPassword"],
+          properties: {
+            currentPassword: {
+              type: "string",
+              example: "oldSecret123",
+              description: "Current account password",
+            },
+            newPassword: {
+              type: "string",
+              minLength: 6,
+              example: "newSecret456",
+              description: "New password (min 6 characters)",
+            },
+          },
+        },
+        // ──────────────────────────────────────────
+        // Admin User Management Schemas
+        // ──────────────────────────────────────────
+        CreateUserRequest: {
+          type: "object",
+          required: ["firstName", "lastName", "email", "password"],
+          properties: {
+            firstName: {
+              type: "string",
+              minLength: 2,
+              example: "Bob",
+            },
+            lastName: {
+              type: "string",
+              minLength: 2,
+              example: "Jones",
+            },
+            email: {
+              type: "string",
+              format: "email",
+              example: "bob@example.com",
+            },
+            password: {
+              type: "string",
+              minLength: 6,
+              example: "pass1234",
+              description: "Initial password for the new user",
+            },
+            role: {
+              type: "string",
+              enum: ["admin", "inspector", "user"],
+              default: "user",
+              example: "inspector",
+              description: "Role assigned to the new user (defaults to 'user')",
+            },
+          },
+        },
+        UpdateUserRequest: {
+          type: "object",
+          properties: {
+            firstName: {
+              type: "string",
+              minLength: 2,
+              example: "Bob",
+            },
+            lastName: {
+              type: "string",
+              minLength: 2,
+              example: "Jones",
+            },
+            email: {
+              type: "string",
+              format: "email",
+              example: "bob@example.com",
+            },
+            password: {
+              type: "string",
+              minLength: 6,
+              example: "newPass1234",
+              description: "Optional new password",
+            },
+            role: {
+              type: "string",
+              enum: ["admin", "inspector", "user"],
+              example: "user",
+            },
+          },
+        },
+        UserResponse: {
+          type: "object",
+          properties: {
+            id: {
+              type: "string",
+              example: "64b1f9c2e4b0f1a2b3c4d5e6",
+            },
+            firstName: {
+              type: "string",
+              example: "Bob",
+            },
+            lastName: {
+              type: "string",
+              example: "Jones",
+            },
+            email: {
+              type: "string",
+              format: "email",
+              example: "bob@example.com",
+            },
+            role: {
+              type: "string",
+              enum: ["admin", "inspector", "user"],
+              example: "inspector",
+            },
+          },
+        },
+        // ──────────────────────────────────────────
+        // Admin Stats Schemas
+        // ──────────────────────────────────────────
+        SystemStatsResponse: {
+          type: "object",
+          properties: {
+            success: { type: "boolean", example: true },
+            data: {
+              type: "object",
+              properties: {
+                users: {
+                  type: "object",
+                  properties: {
+                    total: { type: "integer", example: 42 },
+                    admin: { type: "integer", example: 3 },
+                    inspector: { type: "integer", example: 10 },
+                    user: { type: "integer", example: 29 },
+                  },
+                },
+                extinguishers: {
+                  type: "object",
+                  properties: {
+                    total: { type: "integer", example: 150 },
+                    active: { type: "integer", example: 120 },
+                    expired: { type: "integer", example: 20 },
+                    reported: { type: "integer", example: 7 },
+                    policeNotified: { type: "integer", example: 3 },
+                  },
+                },
+                inspectionsAndMaintenance: {
+                  type: "object",
+                  properties: {
+                    pendingInspections: { type: "integer", example: 15 },
+                    completedInspections: { type: "integer", example: 80 },
+                    maintenanceScheduled: { type: "integer", example: 5 },
+                  },
+                },
+              },
+            },
+          },
+        },
+        DataIntegrityCheckResponse: {
+          type: "object",
+          properties: {
+            success: { type: "boolean", example: true },
+            integrityPassed: { type: "boolean", example: false },
+            totalIssues: { type: "integer", example: 2 },
+            issues: {
+              type: "array",
+              items: { type: "string" },
+              example: [
+                "Extinguisher EXT-001 is marked active but has expired",
+                "User 64b1f9c2 has missing first/last name",
+              ],
+            },
+          },
+        },
+        DataIntegrityCleanResponse: {
+          type: "object",
+          properties: {
+            success: { type: "boolean", example: true },
+            message: {
+              type: "string",
+              example: "Data integrity cleanup executed successfully",
+            },
+            details: {
+              type: "object",
+              properties: {
+                autoExpiredCount: {
+                  type: "integer",
+                  example: 5,
+                  description: "Number of extinguishers automatically marked as expired",
+                },
+              },
+            },
+          },
+        },
+        // ──────────────────────────────────────────
+        // Fire Extinguisher Schemas
+        // ──────────────────────────────────────────
+        InspectionLog: {
+          type: "object",
+          properties: {
+            inspectedAt: {
+              type: "string",
+              format: "date-time",
+              example: "2025-06-01T10:00:00.000Z",
+            },
+            inspectorId: {
+              type: "string",
+              example: "64b1f9c2e4b0f1a2b3c4d5e6",
+            },
+            result: {
+              type: "string",
+              enum: ["pass", "fail"],
+              example: "pass",
+            },
+            notes: {
+              type: "string",
+              example: "Pressure normal, pin intact.",
+            },
+          },
+        },
+        FireExtinguisher: {
+          type: "object",
+          properties: {
+            _id: {
+              type: "string",
+              example: "64b1f9c2e4b0f1a2b3c4d5e6",
+              description: "MongoDB unique identifier",
+            },
+            extinguisherId: {
+              type: "string",
+              example: "EXT-2024-001",
+              description: "Unique extinguisher serial/ID",
+            },
+            ownerName: {
+              type: "string",
+              example: "John Doe",
+            },
+            ownerIdNumber: {
+              type: "string",
+              example: "1234567890123",
+            },
+            ownerEmail: {
+              type: "string",
+              format: "email",
+              example: "john@example.com",
+            },
+            ownerPhone: {
+              type: "string",
+              example: "+250788000000",
+            },
+            dateOfIssue: {
+              type: "string",
+              format: "date",
+              example: "2023-01-15",
+            },
+            expirationDate: {
+              type: "string",
+              format: "date",
+              example: "2025-01-15",
+            },
+            status: {
+              type: "string",
+              enum: ["active", "expired", "reported", "police_notified"],
+              example: "active",
+            },
+            alertSentAt: {
+              type: "string",
+              format: "date-time",
+              nullable: true,
+              example: null,
+            },
+            reminderSentAt: {
+              type: "string",
+              format: "date-time",
+              nullable: true,
+              example: null,
+            },
+            policeNotifiedAt: {
+              type: "string",
+              format: "date-time",
+              nullable: true,
+              example: null,
+            },
+            notes: {
+              type: "string",
+              example: "Stored in main lobby.",
+            },
+            scheduledInspectionDate: {
+              type: "string",
+              format: "date-time",
+              nullable: true,
+              example: "2025-07-01T09:00:00.000Z",
+            },
+            inspectionStatus: {
+              type: "string",
+              enum: ["none", "pending", "completed"],
+              example: "pending",
+            },
+            scheduledMaintenanceDate: {
+              type: "string",
+              format: "date-time",
+              nullable: true,
+              example: null,
+            },
+            maintenanceStatus: {
+              type: "string",
+              enum: ["none", "scheduled", "completed"],
+              example: "none",
+            },
+            maintenanceNotes: {
+              type: "string",
+              example: "Valve replacement required.",
+            },
+            inspectionLogs: {
+              type: "array",
+              items: { $ref: "#/components/schemas/InspectionLog" },
+            },
+            createdAt: {
+              type: "string",
+              format: "date-time",
+              example: "2023-01-15T08:00:00.000Z",
+            },
+            updatedAt: {
+              type: "string",
+              format: "date-time",
+              example: "2025-06-01T10:00:00.000Z",
             },
           },
         },
@@ -168,39 +528,42 @@ const options: swaggerJsdoc.Options = {
           properties: {
             extinguisherId: {
               type: "string",
-              description: "Unique extinguisher ID",
+              example: "EXT-2024-001",
+              description: "Unique extinguisher serial/ID (must not already exist)",
             },
             ownerName: {
               type: "string",
               minLength: 2,
-              description: "Owner full name",
+              example: "John Doe",
             },
             ownerIdNumber: {
               type: "string",
-              description: "Owner ID number",
+              example: "1234567890123",
             },
             ownerEmail: {
               type: "string",
               format: "email",
-              description: "Owner email address",
+              example: "john@example.com",
             },
             ownerPhone: {
               type: "string",
-              description: "Owner phone number",
+              example: "+250788000000",
             },
             dateOfIssue: {
               type: "string",
               format: "date",
-              description: "Date of issue (must be before expiration date)",
+              example: "2023-01-15",
+              description: "Must be before expirationDate",
             },
             expirationDate: {
               type: "string",
               format: "date",
-              description: "Expiration date (must be in the future)",
+              example: "2025-01-15",
+              description: "Must be in the future",
             },
             notes: {
               type: "string",
-              description: "Additional notes",
+              example: "Stored in main lobby.",
             },
           },
         },
@@ -209,111 +572,165 @@ const options: swaggerJsdoc.Options = {
           properties: {
             extinguisherId: {
               type: "string",
-              description: "Unique extinguisher ID",
+              example: "EXT-2024-001",
             },
             ownerName: {
               type: "string",
               minLength: 2,
-              description: "Owner full name",
+              example: "John Doe",
             },
             ownerIdNumber: {
               type: "string",
-              description: "Owner ID number",
+              example: "1234567890123",
             },
             ownerEmail: {
               type: "string",
               format: "email",
-              description: "Owner email address",
+              example: "john@example.com",
             },
             ownerPhone: {
               type: "string",
-              description: "Owner phone number",
+              example: "+250788000000",
             },
             dateOfIssue: {
               type: "string",
               format: "date",
-              description: "Date of issue",
+              example: "2023-01-15",
             },
             expirationDate: {
               type: "string",
               format: "date",
-              description: "Expiration date",
+              example: "2025-01-15",
             },
             notes: {
               type: "string",
-              description: "Additional notes",
+              example: "Moved to server room.",
+            },
+          },
+        },
+        InspectExtinguisherRequest: {
+          type: "object",
+          required: ["result"],
+          properties: {
+            result: {
+              type: "string",
+              enum: ["pass", "fail"],
+              example: "pass",
+              description: "Outcome of the physical inspection",
+            },
+            notes: {
+              type: "string",
+              example: "Pressure normal. Pin intact.",
+              description: "Optional inspector notes",
+            },
+          },
+        },
+        ScheduleMaintenanceRequest: {
+          type: "object",
+          required: ["scheduledMaintenanceDate"],
+          properties: {
+            scheduledMaintenanceDate: {
+              type: "string",
+              format: "date-time",
+              example: "2025-08-01T09:00:00.000Z",
+              description: "Date and time for the scheduled maintenance",
+            },
+            maintenanceNotes: {
+              type: "string",
+              example: "Valve replacement required.",
+              description: "Optional notes for the maintenance team",
+            },
+          },
+        },
+        ScheduleInspectionRequest: {
+          type: "object",
+          required: ["scheduledInspectionDate"],
+          properties: {
+            scheduledInspectionDate: {
+              type: "string",
+              format: "date-time",
+              example: "2025-07-01T09:00:00.000Z",
+              description: "Date and time for the scheduled inspection",
+            },
+          },
+        },
+        DashboardStatsResponse: {
+          type: "object",
+          properties: {
+            success: { type: "boolean", example: true },
+            data: {
+              type: "object",
+              properties: {
+                total: { type: "integer", example: 50 },
+                active: { type: "integer", example: 35 },
+                expired: { type: "integer", example: 10 },
+                policeNotified: { type: "integer", example: 2 },
+                recent: {
+                  type: "array",
+                  items: { $ref: "#/components/schemas/FireExtinguisher" },
+                  description: "5 most recently added extinguishers",
+                },
+              },
+            },
+          },
+        },
+        // ──────────────────────────────────────────
+        // Generic Response Schemas
+        // ──────────────────────────────────────────
+        SuccessResponse: {
+          type: "object",
+          properties: {
+            success: { type: "boolean", example: true },
+            message: { type: "string", example: "Operation completed successfully" },
+          },
+        },
+        PaginatedExtinguisherResponse: {
+          type: "object",
+          properties: {
+            success: { type: "boolean", example: true },
+            data: {
+              type: "array",
+              items: { $ref: "#/components/schemas/FireExtinguisher" },
+            },
+            pagination: {
+              type: "object",
+              properties: {
+                page: { type: "integer", example: 1 },
+                limit: { type: "integer", example: 10 },
+                total: { type: "integer", example: 150 },
+                pages: { type: "integer", example: 15 },
+              },
+            },
+          },
+        },
+        UserListResponse: {
+          type: "object",
+          properties: {
+            success: { type: "boolean", example: true },
+            data: {
+              type: "array",
+              items: { $ref: "#/components/schemas/UserResponse" },
             },
           },
         },
         Error: {
           type: "object",
           properties: {
-            success: {
-              type: "boolean",
-              example: false,
-            },
+            success: { type: "boolean", example: false },
             message: {
               type: "string",
-              description: "Error message",
+              example: "An error occurred",
+              description: "Human-readable error message",
             },
             errors: {
               type: "array",
+              description: "Field-level validation errors (if any)",
               items: {
                 type: "object",
                 properties: {
-                  msg: {
-                    type: "string",
-                  },
-                  param: {
-                    type: "string",
-                  },
-                  location: {
-                    type: "string",
-                  },
-                },
-              },
-            },
-          },
-        },
-        SuccessResponse: {
-          type: "object",
-          properties: {
-            success: {
-              type: "boolean",
-              example: true,
-            },
-            message: {
-              type: "string",
-            },
-          },
-        },
-        PaginatedResponse: {
-          type: "object",
-          properties: {
-            success: {
-              type: "boolean",
-              example: true,
-            },
-            data: {
-              type: "array",
-              items: {
-                $ref: "#/components/schemas/FireExtinguisher",
-              },
-            },
-            pagination: {
-              type: "object",
-              properties: {
-                page: {
-                  type: "number",
-                },
-                limit: {
-                  type: "number",
-                },
-                total: {
-                  type: "number",
-                },
-                pages: {
-                  type: "number",
+                  msg: { type: "string", example: "Valid email required" },
+                  param: { type: "string", example: "email" },
+                  location: { type: "string", example: "body" },
                 },
               },
             },
@@ -322,7 +739,7 @@ const options: swaggerJsdoc.Options = {
       },
     },
   },
-  apis: ["./src/routes/*.ts", "./src/controllers/*.ts"],
+  apis: ["./src/routes/*.ts"],
 };
 
 export const swaggerSpec = swaggerJsdoc(options);

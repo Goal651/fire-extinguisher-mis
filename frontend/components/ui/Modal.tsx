@@ -1,11 +1,16 @@
 "use client";
 
+import { useEffect } from "react";
+import Button from "./Button";
+
 interface Props {
   open: boolean;
   title: string;
   message: string;
   onConfirm: () => void;
   onClose: () => void;
+  confirmLabel?: string;
+  confirmVariant?: "danger" | "primary";
 }
 
 export default function Modal({
@@ -14,46 +19,56 @@ export default function Modal({
   message,
   onConfirm,
   onClose,
+  confirmLabel = "Delete",
+  confirmVariant = "danger",
 }: Props) {
+  // Close on Escape
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [open, onClose]);
+
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ backgroundColor: "rgba(0,0,0,0.45)" }}
+      onClick={onClose}
+    >
       <div
-        className="p-6 rounded-lg w-100 shadow-xl"
-        style={{ backgroundColor: "#FFFFFF" }}
+        className="w-full max-w-sm rounded-xl shadow-2xl p-6 space-y-4"
+        style={{ backgroundColor: "#ffffff" }}
+        onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-lg font-bold mb-4" style={{ color: "#2F2F2F" }}>
-          {title}
-        </h2>
+        {/* Icon */}
+        <div
+          className="w-10 h-10 rounded-full flex items-center justify-center text-lg"
+          style={{ backgroundColor: "#ffeaea" }}
+        >
+          🗑
+        </div>
 
-        <p className="mb-6" style={{ color: "#666666" }}>
-          {message}
-        </p>
+        <div>
+          <h2 className="text-base font-bold" style={{ color: "#2f2f2f" }}>
+            {title}
+          </h2>
+          <p className="mt-1 text-sm leading-relaxed" style={{ color: "#666666" }}>
+            {message}
+          </p>
+        </div>
 
-        <div className="flex gap-3">
-          <button
-            onClick={onClose}
-            className="flex-1 py-2 rounded-lg transition"
-            style={{
-              backgroundColor: "#FBFBFB",
-              color: "#2F2F2F",
-              border: "1px solid #D2D2D2",
-            }}
-          >
+        <div className="flex gap-3 pt-1">
+          <Button variant="secondary" className="flex-1" onClick={onClose}>
             Cancel
-          </button>
-
-          <button
-            onClick={onConfirm}
-            className="flex-1 py-2 rounded-lg transition"
-            style={{
-              backgroundColor: "#D32F2F",
-              color: "#FFFFFF",
-            }}
-          >
-            Delete
-          </button>
+          </Button>
+          <Button variant={confirmVariant} className="flex-1" onClick={onConfirm}>
+            {confirmLabel}
+          </Button>
         </div>
       </div>
     </div>

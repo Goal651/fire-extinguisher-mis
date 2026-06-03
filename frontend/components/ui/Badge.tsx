@@ -1,28 +1,33 @@
 import { ExtinguisherStatus } from "@/types";
+import clsx from "clsx";
 
 interface Props {
   status: ExtinguisherStatus;
+  size?: "sm" | "md";
 }
 
-export default function Badge({ status }: Props) {
+export default function Badge({ status, size = "md" }: Props) {
   const colors = {
-    active: { bg: "#4CAF50", text: "#FFFFFF" },
-    expired: { bg: "#F44336", text: "#FFFFFF" },
-    reported: { bg: "#FFC107", text: "#000000" },
-    police_notified: { bg: "#D32F2F", text: "#FFFFFF" },
+    active: "bg-emerald-500 text-white",
+    expired: "bg-red-500 text-white",
+    reported: "bg-amber-500 text-black",
+    police_notified: "bg-red-700 text-white",
   };
 
-  const color = colors[status];
+  const sizes = {
+    sm: "px-2 py-0.5 text-[10px]",
+    md: "px-2.5 py-1 text-xs",
+  };
 
   return (
     <span
-      className="px-3 py-1 rounded-full text-xs font-medium"
-      style={{
-        backgroundColor: color.bg,
-        color: color.text,
-      }}
+      className={clsx(
+        "inline-flex items-center justify-center rounded-full font-semibold uppercase tracking-wide",
+        colors[status],
+        sizes[size],
+      )}
     >
-      {status.replace("_", " ").toUpperCase()}
+      {status.replace("_", " ")}
     </span>
   );
 }
