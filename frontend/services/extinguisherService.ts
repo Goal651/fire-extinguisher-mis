@@ -43,6 +43,29 @@ export const extinguisherService = {
 
     return response.data;
   },
+
+  inspect: async (id: string, result: "pass" | "fail", notes?: string) => {
+    const response = await api.post(`/extinguishers/${id}/inspect`, {
+      result,
+      notes,
+    });
+    return response.data;
+  },
+
+  scheduleMaintenance: async (id: string, scheduledMaintenanceDate: string, maintenanceNotes?: string) => {
+    const response = await api.post(`/extinguishers/${id}/maintenance`, {
+      scheduledMaintenanceDate,
+      maintenanceNotes,
+    });
+    return response.data;
+  },
+
+  scheduleInspection: async (id: string, scheduledInspectionDate: string) => {
+    const response = await api.post(`/extinguishers/${id}/schedule-inspection`, {
+      scheduledInspectionDate,
+    });
+    return response.data;
+  },
 };
 
 export const getExtinguishers = async (
@@ -90,5 +113,25 @@ export const deleteExtinguisher = async (id: string) => {
 export const markReported = async (id: string) => {
   const response = await api.put(`/extinguishers/${id}/mark-reported`);
 
+  return response.data;
+};
+
+export const inspectExtinguisher = async (id: string, result: "pass" | "fail", notes?: string) => {
+  const response = await api.post(`/extinguishers/${id}/inspect`, { result, notes });
+  return response.data;
+};
+
+export const scheduleMaintenance = async (id: string, scheduledMaintenanceDate: string, maintenanceNotes?: string) => {
+  const response = await api.post(`/extinguishers/${id}/maintenance`, {
+    scheduledMaintenanceDate,
+    maintenanceNotes,
+  });
+  return response.data;
+};
+
+export const scheduleInspection = async (id: string, scheduledInspectionDate: string) => {
+  const response = await api.post(`/extinguishers/${id}/schedule-inspection`, {
+    scheduledInspectionDate,
+  });
   return response.data;
 };

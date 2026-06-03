@@ -2,26 +2,40 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useAuthContext } from "@/context/AuthContext";
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const { admin } = useAuthContext();
 
   const links = [
     {
       href: "/dashboard",
       label: "Dashboard",
     },
-
     {
       href: "/dashboard/extinguishers",
       label: "Extinguishers",
     },
-
     {
       href: "/dashboard/profile",
       label: "Profile",
     },
   ];
+
+  // Render Admin-only links
+  if (admin && admin.role === "admin") {
+    links.push(
+      {
+        href: "/dashboard/users",
+        label: "Users Management",
+      },
+      {
+        href: "/dashboard/data-integrity",
+        label: "Data Integrity",
+      }
+    );
+  }
 
   return (
     <aside
