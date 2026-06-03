@@ -4,11 +4,11 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 
-import { connectDB } from "../../shared/config/db";
+import { connectDB } from "../shared/config/db";
 import extinguisherRoutes from "./routes/extinguisherRoutes";
-import { errorHandler } from "../../shared/middleware/errorMiddleware";
+import { errorHandler } from "../shared/middleware/errorMiddleware";
 import { startCronJobs } from "./services/cronService";
-import { connectRabbitMQ } from "../../shared/rabbitmq";
+import { connectRabbitMQ } from "../shared/rabbitmq";
 
 dotenv.config();
 

@@ -1,7 +1,7 @@
-import { Response } from "express";
+import { Response,Request } from "express";
 import FireExtinguisher from "../../shared/models/FireExtinguisher";
 
-export const createExtinguisher = async (req: any, res: Response) => {
+export const createExtinguisher = async (req: Request, res: Response) => {
   try {
     const existing = await FireExtinguisher.findOne({
       extinguisherId: req.body.extinguisherId,
