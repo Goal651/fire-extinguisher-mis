@@ -61,9 +61,10 @@ export const resetPassword = async (token: string, password: string) => {
   return response.data;
 };
 
-export const updateProfile = async (name: string, email: string) => {
+export const updateProfile = async (firstName: string, lastName: string, email: string) => {
   const response = await api.put("/auth/update-profile", {
-    name,
+    firstName,
+    lastName,
     email,
   });
 

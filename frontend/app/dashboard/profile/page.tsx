@@ -42,12 +42,16 @@ export default function ProfilePage() {
   });
 
   useEffect(() => {
-    if (admin) profileForm.reset({ name: admin.firstName + " " + admin.lastName, email: admin.email });
+    if (admin) profileForm.reset({
+      firstName: admin.firstName,
+      lastName: admin.lastName,
+      email: admin.email
+    });
   }, [admin]);
 
   const onProfileUpdate = async (data: UpdateProfileSchema) => {
     try {
-      await updateProfile(data.name, data.email);
+      await updateProfile(data.firstName, data.lastName, data.email);
       toast.success("Profile updated");
       loadProfile();
     } catch (err: any) {
@@ -117,10 +121,16 @@ export default function ProfilePage() {
         {tab === "profile" && (
           <form onSubmit={profileForm.handleSubmit(onProfileUpdate)} className="space-y-4">
             <Input
-              label="Full Name"
-              placeholder="Your name"
-              {...profileForm.register("name")}
-              error={profileForm.formState.errors.name?.message}
+              label="First Name"
+              placeholder="Your first name"
+              {...profileForm.register("firstName")}
+              error={profileForm.formState.errors.firstName?.message}
+            />
+            <Input
+              label="Last Name"
+              placeholder="Your last name"
+              {...profileForm.register("lastName")}
+              error={profileForm.formState.errors.lastName?.message}
             />
             <Input
               label="Email"
