@@ -1,9 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 
 import jwt from "jsonwebtoken";
+import { IUser } from "../models/User";
 
 export interface AuthRequest extends Request {
-  admin?: any;
+  user?: IUser;
 }
 
 export const protect = (
@@ -23,9 +24,9 @@ export const protect = (
   try {
     const token = authHeader.split(" ")[1];
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as IUser;
 
-    req.admin = decoded;
+    req.user = decoded;
 
     next();
   } catch {

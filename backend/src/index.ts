@@ -11,6 +11,7 @@ import { swaggerSpec } from "./config/swagger";
 
 import authRoutes from "./routes/authRoutes";
 import extinguisherRoutes from "./routes/extinguisherRoutes";
+import adminRoutes from "./routes/adminRoutes";
 
 import { startCronJobs } from "./services/cronService";
 
@@ -80,6 +81,8 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/api/auth", authRoutes);
 
 app.use("/api/extinguishers", extinguisherRoutes);
+
+app.use("/api/admin", adminRoutes);
 
 app.use(errorHandler);
 

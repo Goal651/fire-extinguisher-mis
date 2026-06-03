@@ -13,52 +13,10 @@ import {
 
 import { protect } from "../middleware/authMiddleware";
 import { validateRequest } from "../middleware/validateMiddleware";
+import { extinguisherRegistrationValidation } from "../validators/extinguisherValidators";
 
 const router = Router();
 
-const extinguisherValidation = [
-  body("extinguisherId")
-    .trim()
-    .notEmpty()
-    .withMessage("Extinguisher ID required"),
-
-  body("ownerName")
-    .trim()
-    .isLength({ min: 2 })
-    .withMessage("Owner name required"),
-
-  body("ownerIdNumber").trim().notEmpty().withMessage("Owner ID required"),
-
-  body("ownerEmail").isEmail().withMessage("Valid email required"),
-
-  body("ownerPhone").trim().notEmpty(),
-
-  body("dateOfIssue")
-    .isISO8601()
-    .custom((value, { req }) => {
-      const issueDate = new Date(value);
-
-      const expiryDate = new Date(req.body.expirationDate);
-
-      if (issueDate >= expiryDate) {
-        throw new Error("Issue date must be before expiry date");
-      }
-
-      return true;
-    }),
-
-  body("expirationDate")
-    .isISO8601()
-    .custom((value) => {
-      const expiry = new Date(value);
-
-      if (expiry <= new Date()) {
-        throw new Error("Expiration date must be in future");
-      }
-
-      return true;
-    }),
-];
 
 /**
  * @swagger
@@ -109,7 +67,7 @@ const extinguisherValidation = [
 router.post(
   "/",
   protect,
-  extinguisherValidation,
+  extinguisherRegistrationValidation,
   validateRequest,
   createExtinguisher,
 );
@@ -273,7 +231,7 @@ router.get("/:id", protect, getExtinguisher);
 router.put(
   "/:id",
   protect,
-  extinguisherValidation,
+  extinguisherRegistrationValidation,
   validateRequest,
   updateExtinguisher,
 );

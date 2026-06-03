@@ -1,4 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
+import { IUser } from "./User";
 
 export enum FireExtinguisherType {
   WATER= "WATER",
@@ -24,6 +25,7 @@ export interface IFireExtinguisher extends Document {
   lastInspectionDate: Date,
   nextInspectionDate: Date,
   status: "active" | "expired" | "reported",
+  owner:IUser
 }
 
 const extinguisherSchema = new Schema<IFireExtinguisher>(
@@ -37,6 +39,7 @@ const extinguisherSchema = new Schema<IFireExtinguisher>(
     lastInspectionDate: { type: Date, required: true },
     nextInspectionDate: { type: Date, required: true },
     status: { type: String, enum: ["active", "expired", "reported"], default: "active" },
+    owner: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   },
 );
 

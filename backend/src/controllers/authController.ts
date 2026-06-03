@@ -74,7 +74,6 @@ export const resendOtp = async (req: any, res: Response) => {
 
   const otp = generateOTP();
 
-
   await sendEmail(email, "OTP Code", `<h1>${otp}</h1>`);
 
   return res.json({
