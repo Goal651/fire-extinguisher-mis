@@ -30,6 +30,8 @@ export interface IFireExtinguisher extends Document {
   dateOfIssue: Date;
   expirationDate: Date;
   status: "active" | "expired" | "reported" | "police_notified";
+  type: FireExtinguisherType;
+  size: FireExtinguisherSize;
   alertSentAt?: Date | null;
   reminderSentAt?: Date | null;
   policeNotifiedAt?: Date | null;
@@ -53,6 +55,16 @@ const extinguisherSchema = new Schema<IFireExtinguisher>(
     ownerPhone: { type: String, required: true },
     dateOfIssue: { type: Date, required: true },
     expirationDate: { type: Date, required: true },
+    type: {
+      type: String,
+      enum: [FireExtinguisherType.WATER, FireExtinguisherType.CO2, FireExtinguisherType.FOAM, FireExtinguisherType.DRY_CHEMICAL],
+      required: true,
+    },
+    size: {
+      type: String,
+      enum: [FireExtinguisherSize["2.5LBS"], FireExtinguisherSize["5LBS"], FireExtinguisherSize["9LBS"], FireExtinguisherSize["12LBS"]],
+      required: true,
+    },
     status: {
       type: String,
       enum: ["active", "expired", "reported", "police_notified"],
