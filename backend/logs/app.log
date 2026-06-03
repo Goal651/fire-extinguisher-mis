@@ -1,0 +1,84 @@
+[2026-06-01T07:38:05.241Z] [HTTP] OPTIONS /api/extinguishers?page=1&limit=10&search=&status= 204 0 - 1.135 ms
+[2026-06-01T07:38:05.254Z] [HTTP] OPTIONS /api/extinguishers?page=1&limit=10&search=&status= 204 0 - 0.093 ms
+[2026-06-01T07:38:05.262Z] [HTTP] GET /api/extinguishers?page=1&limit=10&search=&status= 200 1500 - 18.023 ms
+[2026-06-01T07:38:05.268Z] [HTTP] GET /api/extinguishers?page=1&limit=10&search=&status= 304 - - 4.316 ms
+[2026-06-01T07:39:50.842Z] [HTTP] OPTIONS /api/auth/me 204 0 - 0.980 ms
+[2026-06-01T07:39:50.845Z] [HTTP] OPTIONS /api/extinguishers?page=1&limit=10&search=&status= 204 0 - 0.228 ms
+[2026-06-01T07:39:50.846Z] [HTTP] OPTIONS /api/extinguishers?page=1&limit=10&search=&status= 204 0 - 0.112 ms
+[2026-06-01T07:39:50.861Z] [HTTP] GET /api/auth/me 304 - - 14.419 ms
+[2026-06-01T07:39:50.866Z] [HTTP] GET /api/extinguishers?page=1&limit=10&search=&status= 304 - - 11.538 ms
+[2026-06-01T07:39:50.872Z] [HTTP] GET /api/extinguishers?page=1&limit=10&search=&status= 304 - - 4.912 ms
+[2026-06-01T07:46:35.882Z] [HTTP] OPTIONS /api/auth/me 204 0 - 0.102 ms
+[2026-06-01T07:46:35.888Z] [HTTP] GET /api/auth/me 304 - - 3.551 ms
+[2026-06-01T07:46:35.891Z] [HTTP] OPTIONS /api/extinguishers?page=1&limit=10&search=&status= 204 0 - 0.225 ms
+[2026-06-01T07:46:35.894Z] [HTTP] OPTIONS /api/extinguishers?page=1&limit=10&search=&status= 204 0 - 0.266 ms
+[2026-06-01T07:46:35.901Z] [HTTP] GET /api/extinguishers?page=1&limit=10&search=&status= 304 - - 5.236 ms
+[2026-06-01T07:46:35.906Z] [HTTP] GET /api/extinguishers?page=1&limit=10&search=&status= 304 - - 4.086 ms
+[2026-06-01T07:46:38.546Z] [HTTP] GET /api/auth/me 304 - - 3.503 ms
+[2026-06-01T07:46:38.550Z] [HTTP] GET /api/auth/me 304 - - 2.829 ms
+[2026-06-01T07:46:50.140Z] [HTTP] OPTIONS /api/auth/update-profile 204 0 - 0.077 ms
+[2026-06-01T07:46:50.199Z] [INFO] Profile updated for: aimable.kwizera14@gmail.com
+[2026-06-01T07:46:50.200Z] [HTTP] PUT /api/auth/update-profile 200 156 - 57.697 ms
+[2026-06-01T07:46:50.204Z] [HTTP] OPTIONS /api/auth/me 204 0 - 0.091 ms
+[2026-06-01T07:46:50.209Z] [HTTP] GET /api/auth/me 200 202 - 2.712 ms
+[2026-06-01T07:47:12.123Z] [HTTP] OPTIONS /api/auth/change-password 204 0 - 0.125 ms
+[2026-06-01T07:47:12.530Z] [INFO] Password changed for: aimable.kwizera14@gmail.com
+[2026-06-01T07:47:17.109Z] [HTTP] POST /api/auth/change-password 200 58 - 4984.261 ms
+[2026-06-01T07:47:29.659Z] [HTTP] OPTIONS /api/auth/change-password 204 0 - 0.093 ms
+[2026-06-01T07:47:29.859Z] [WARN] Incorrect current password for: aimable.kwizera14@gmail.com
+[2026-06-01T07:47:29.860Z] [HTTP] POST /api/auth/change-password 401 59 - 198.827 ms
+[2026-06-01T07:47:39.702Z] [HTTP] OPTIONS /api/auth/login 204 0 - 0.081 ms
+[2026-06-01T07:47:39.905Z] [WARN] Failed login attempt for email: aimable.kwizera14@gmail.com
+[2026-06-01T07:47:39.905Z] [HTTP] POST /api/auth/login 401 49 - 201.499 ms
+[2026-06-01T07:47:43.202Z] [WARN] Failed login attempt for email: aimable.kwizera14@gmail.com
+[2026-06-01T07:47:43.203Z] [HTTP] POST /api/auth/login 401 49 - 201.643 ms
+[2026-06-01T07:47:46.923Z] [HTTP] OPTIONS /api/auth/login 204 0 - 0.063 ms
+[2026-06-01T07:47:47.204Z] [WARN] Failed login attempt for email: aimable.kwizera14@gmail.com
+[2026-06-01T07:47:47.205Z] [HTTP] POST /api/auth/login 401 49 - 207.207 ms
+[2026-06-01T07:47:52.400Z] [HTTP] OPTIONS /api/auth/login 204 0 - 0.081 ms
+[2026-06-01T07:47:52.600Z] [WARN] Failed login attempt for email: aimable.kwizera14@gmail.com
+[2026-06-01T07:47:52.601Z] [HTTP] POST /api/auth/login 401 49 - 199.474 ms
+[2026-06-01T07:47:57.495Z] [HTTP] OPTIONS /api/auth/forgot-password 204 0 - 0.100 ms
+[2026-06-01T07:48:05.905Z] [INFO] Password reset email sent to: aimable.kwizera14@gmail.com
+[2026-06-01T07:48:05.908Z] [HTTP] POST /api/auth/forgot-password 200 54 - 8410.082 ms
+[2026-06-01T07:48:54.077Z] [HTTP] OPTIONS /api/auth/reset-password 204 0 - 0.086 ms
+[2026-06-01T07:48:54.287Z] [INFO] Password reset successful for: aimable.kwizera14@gmail.com
+[2026-06-01T07:48:59.973Z] [HTTP] POST /api/auth/reset-password 200 92 - 5893.197 ms
+[2026-06-01T07:49:04.015Z] [HTTP] OPTIONS /api/auth/login 204 0 - 0.091 ms
+[2026-06-01T07:49:14.992Z] [INFO] OTP sent successfully to: aimable.kwizera14@gmail.com
+[2026-06-01T07:49:14.994Z] [HTTP] POST /api/auth/login 200 50 - 10976.890 ms
+[2026-06-01T07:49:31.895Z] [HTTP] OPTIONS /api/auth/verify-otp 204 0 - 0.103 ms
+[2026-06-01T07:49:31.902Z] [HTTP] POST /api/auth/verify-otp 200 348 - 5.056 ms
+[2026-06-01T07:49:32.067Z] [HTTP] OPTIONS /api/extinguishers/dash/dashboard-stats 204 0 - 0.115 ms
+[2026-06-01T07:49:32.068Z] [HTTP] OPTIONS /api/extinguishers/dash/dashboard-stats 204 0 - 0.086 ms
+[2026-06-01T07:49:32.081Z] [HTTP] GET /api/extinguishers/dash/dashboard-stats 304 - - 8.705 ms
+[2026-06-01T07:49:32.091Z] [HTTP] GET /api/extinguishers/dash/dashboard-stats 304 - - 9.438 ms
+[2026-06-01T07:49:35.494Z] [HTTP] OPTIONS /api/extinguishers?page=1&limit=10&search=&status= 204 0 - 0.181 ms
+[2026-06-01T07:49:35.496Z] [HTTP] OPTIONS /api/extinguishers?page=1&limit=10&search=&status= 204 0 - 0.422 ms
+[2026-06-01T07:49:35.504Z] [HTTP] GET /api/extinguishers?page=1&limit=10&search=&status= 304 - - 4.492 ms
+[2026-06-01T07:49:35.508Z] [HTTP] GET /api/extinguishers?page=1&limit=10&search=&status= 304 - - 3.273 ms
+[2026-06-01T07:49:37.004Z] [HTTP] OPTIONS /api/auth/me 204 0 - 0.123 ms
+[2026-06-01T07:49:37.006Z] [HTTP] OPTIONS /api/auth/me 204 0 - 0.189 ms
+[2026-06-01T07:49:37.012Z] [HTTP] GET /api/auth/me 200 202 - 3.293 ms
+[2026-06-01T07:49:37.018Z] [HTTP] GET /api/auth/me 304 - - 2.576 ms
+[2026-06-01T07:49:38.252Z] [HTTP] GET /api/extinguishers?page=1&limit=10&search=&status= 304 - - 4.593 ms
+[2026-06-01T07:49:38.258Z] [HTTP] GET /api/extinguishers?page=1&limit=10&search=&status= 304 - - 5.587 ms
+[2026-06-01T07:49:39.610Z] [HTTP] OPTIONS /api/extinguishers/dash/dashboard-stats 204 0 - 0.133 ms
+[2026-06-01T07:49:39.612Z] [HTTP] OPTIONS /api/extinguishers/dash/dashboard-stats 204 0 - 0.203 ms
+[2026-06-01T07:49:39.630Z] [HTTP] GET /api/extinguishers/dash/dashboard-stats 304 - - 15.090 ms
+[2026-06-01T07:49:39.642Z] [HTTP] GET /api/extinguishers/dash/dashboard-stats 304 - - 10.029 ms
+[2026-06-01T08:35:59.119Z] [HTTP] OPTIONS /api/auth/me 204 0 - 1.737 ms
+[2026-06-01T08:35:59.134Z] [HTTP] OPTIONS /api/extinguishers/dash/dashboard-stats 204 0 - 0.189 ms
+[2026-06-01T08:35:59.142Z] [HTTP] GET /api/auth/me 304 - - 20.274 ms
+[2026-06-01T08:35:59.143Z] [HTTP] OPTIONS /api/extinguishers/dash/dashboard-stats 204 0 - 0.141 ms
+[2026-06-01T08:35:59.238Z] [HTTP] GET /api/extinguishers/dash/dashboard-stats 200 1694 - 92.973 ms
+[2026-06-01T08:35:59.262Z] [HTTP] GET /api/extinguishers/dash/dashboard-stats 304 - - 22.387 ms
+[2026-06-01T08:36:02.409Z] [HTTP] GET /api/auth/me 304 - - 14.765 ms
+[2026-06-01T08:36:02.419Z] [HTTP] GET /api/extinguishers/dash/dashboard-stats 200 1508 - 14.842 ms
+[2026-06-01T08:36:02.428Z] [HTTP] GET /api/extinguishers/dash/dashboard-stats 304 - - 7.463 ms
+[2026-06-01T08:36:25.656Z] [HTTP] OPTIONS /api/auth/me 204 0 - 0.291 ms
+[2026-06-01T08:36:25.658Z] [HTTP] OPTIONS /api/extinguishers/dash/dashboard-stats 204 0 - 0.194 ms
+[2026-06-01T08:36:25.660Z] [HTTP] OPTIONS /api/extinguishers/dash/dashboard-stats 204 0 - 0.187 ms
+[2026-06-01T08:36:25.666Z] [HTTP] GET /api/auth/me 304 - - 4.330 ms
+[2026-06-01T08:36:25.673Z] [HTTP] GET /api/extinguishers/dash/dashboard-stats 304 - - 8.564 ms
+[2026-06-01T08:36:25.680Z] [HTTP] GET /api/extinguishers/dash/dashboard-stats 304 - - 6.208 ms
