@@ -178,15 +178,15 @@ function SummaryTab({ data }: { data: SummaryReportData }) {
   ];
 
   const stockPie = [
-    { name: "Active",          value: data.stock.active,         fill: CHART_COLORS.active },
-    { name: "Expired",         value: data.stock.expired,        fill: CHART_COLORS.expired },
-    { name: "Reported",        value: data.stock.reported,       fill: CHART_COLORS.reported },
-    { name: "Police Notified", value: data.stock.policeNotified, fill: CHART_COLORS.police },
+    { name: "Active",          value: data.stock.active         ?? 0, fill: CHART_COLORS.active },
+    { name: "Expired",         value: data.stock.expired        ?? 0, fill: CHART_COLORS.expired },
+    { name: "Reported",        value: data.stock.reported       ?? 0, fill: CHART_COLORS.reported },
+    { name: "Police Notified", value: data.stock.policeNotified ?? 0, fill: CHART_COLORS.police },
   ].filter((d) => d.value > 0);
 
   const inspPie = [
-    { name: "Passed", value: data.inspections.passed, fill: CHART_COLORS.pass },
-    { name: "Failed", value: data.inspections.failed, fill: CHART_COLORS.fail },
+    { name: "Passed", value: data.inspections.passed ?? 0, fill: CHART_COLORS.pass },
+    { name: "Failed", value: data.inspections.failed ?? 0, fill: CHART_COLORS.fail },
   ].filter((d) => d.value > 0);
 
   return (
@@ -234,16 +234,16 @@ function SummaryTab({ data }: { data: SummaryReportData }) {
 
 function StockTab({ data }: { data: StockReportData }) {
   const breakdown = [
-    { label: "Active",          value: data.active,         color: CHART_COLORS.active },
-    { label: "Expired",         value: data.expired,        color: CHART_COLORS.expired },
-    { label: "Reported",        value: data.reported,       color: CHART_COLORS.reported },
-    { label: "Police Notified", value: data.policeNotified, color: CHART_COLORS.police },
+    { label: "Active",          value: data.active         ?? 0, color: CHART_COLORS.active },
+    { label: "Expired",         value: data.expired        ?? 0, color: CHART_COLORS.expired },
+    { label: "Reported",        value: data.reported       ?? 0, color: CHART_COLORS.reported },
+    { label: "Police Notified", value: data.policeNotified ?? 0, color: CHART_COLORS.police },
   ];
 
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <KpiCard label="Total" value={data.total} color={CHART_COLORS.primary} />
+        <KpiCard label="Total" value={data.total ?? 0} color={CHART_COLORS.primary} />
         {breakdown.map((b) => <KpiCard key={b.label} label={b.label} value={b.value} color={b.color} />)}
       </div>
 
@@ -282,24 +282,24 @@ function StockTab({ data }: { data: StockReportData }) {
 
 function InspectionsTab({ data }: { data: InspectionReportData }) {
   const breakdown = [
-    { label: "None",      value: data.none,      color: CHART_COLORS.none },
-    { label: "Pending",   value: data.pending,   color: CHART_COLORS.pending },
-    { label: "Completed", value: data.completed, color: CHART_COLORS.completed },
+    { label: "None",      value: data.none      ?? 0, color: CHART_COLORS.none },
+    { label: "Pending",   value: data.pending   ?? 0, color: CHART_COLORS.pending },
+    { label: "Completed", value: data.completed ?? 0, color: CHART_COLORS.completed },
   ];
 
   const results = [
-    { label: "Passed", value: data.passed, fill: CHART_COLORS.pass },
-    { label: "Failed", value: data.failed, fill: CHART_COLORS.fail },
+    { label: "Passed", value: data.passed ?? 0, fill: CHART_COLORS.pass },
+    { label: "Failed", value: data.failed ?? 0, fill: CHART_COLORS.fail },
   ].filter((d) => d.value > 0);
 
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-        <KpiCard label="Total"     value={data.total}     color={CHART_COLORS.primary} />
-        <KpiCard label="None"      value={data.none}      color={CHART_COLORS.none} />
-        <KpiCard label="Pending"   value={data.pending}   color={CHART_COLORS.pending} />
-        <KpiCard label="Completed" value={data.completed} color={CHART_COLORS.completed} />
-        <KpiCard label="Passed"    value={data.passed}    color={CHART_COLORS.pass} />
+        <KpiCard label="Total"     value={data.total     ?? 0} color={CHART_COLORS.primary} />
+        <KpiCard label="None"      value={data.none      ?? 0} color={CHART_COLORS.none} />
+        <KpiCard label="Pending"   value={data.pending   ?? 0} color={CHART_COLORS.pending} />
+        <KpiCard label="Completed" value={data.completed ?? 0} color={CHART_COLORS.completed} />
+        <KpiCard label="Passed"    value={data.passed    ?? 0} color={CHART_COLORS.pass} />
         <KpiCard label="Pass Rate" value={`${data.passRate ?? 0}%`} color={CHART_COLORS.pass} />
       </div>
 
@@ -356,8 +356,8 @@ function ExpiredTab({ data }: { data: ExpiredReportData }) {
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-2 gap-3">
-        <KpiCard label="Total Expired"    value={data.totalExpired}   color={CHART_COLORS.expired} />
-        <KpiCard label="Police Notified"  value={data.policeNotified} color={CHART_COLORS.police} />
+        <KpiCard label="Total Expired"   value={data.totalExpired   ?? 0} color={CHART_COLORS.expired} />
+        <KpiCard label="Police Notified" value={data.policeNotified ?? 0} color={CHART_COLORS.police} />
       </div>
 
       <ChartCard title="Expiry Trend">
@@ -430,18 +430,18 @@ function ExpiredTab({ data }: { data: ExpiredReportData }) {
 
 function MaintenanceTab({ data }: { data: MaintenanceReportData }) {
   const breakdown = [
-    { label: "None",      value: data.none,      color: CHART_COLORS.none },
-    { label: "Scheduled", value: data.scheduled, color: CHART_COLORS.scheduled },
-    { label: "Completed", value: data.completed, color: CHART_COLORS.completed },
+    { label: "None",      value: data.none      ?? 0, color: CHART_COLORS.none },
+    { label: "Scheduled", value: data.scheduled ?? 0, color: CHART_COLORS.scheduled },
+    { label: "Completed", value: data.completed ?? 0, color: CHART_COLORS.completed },
   ];
 
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <KpiCard label="Total"     value={data.total}     color={CHART_COLORS.primary} />
-        <KpiCard label="None"      value={data.none}      color={CHART_COLORS.none} />
-        <KpiCard label="Scheduled" value={data.scheduled} color={CHART_COLORS.scheduled} />
-        <KpiCard label="Completed" value={data.completed} color={CHART_COLORS.completed} />
+        <KpiCard label="Total"     value={data.total     ?? 0} color={CHART_COLORS.primary} />
+        <KpiCard label="None"      value={data.none      ?? 0} color={CHART_COLORS.none} />
+        <KpiCard label="Scheduled" value={data.scheduled ?? 0} color={CHART_COLORS.scheduled} />
+        <KpiCard label="Completed" value={data.completed ?? 0} color={CHART_COLORS.completed} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -535,13 +535,15 @@ function MaintenanceTab({ data }: { data: MaintenanceReportData }) {
 // ── Shared sub-components ────────────────────────────────────────────────────
 
 function KpiCard({ label, value, color }: { label: string; value: number | string; color: string }) {
+  // Ensure 0 renders as "0" not blank
+  const display = value === undefined || value === null ? "—" : String(value);
   return (
     <div className="rounded-xl border p-4" style={{ backgroundColor: color + "0d", borderColor: color + "33" }}>
       <p className="text-xs font-semibold uppercase tracking-wider truncate" style={{ color }}>
         {label}
       </p>
       <p className="text-2xl font-bold mt-2 leading-none" style={{ color }}>
-        {value}
+        {display}
       </p>
     </div>
   );

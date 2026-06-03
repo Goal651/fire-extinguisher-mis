@@ -1,0 +1,9 @@
+{
+	"dependencies": {
+		"amqplib": "^2.0.1",
+		"express-http-proxy": "^2.1.2"
+	},
+	"devDependencies": {
+		"@types/express-http-proxy": "^1.6.7"
+	}
+}
