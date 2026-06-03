@@ -1,4 +1,6 @@
 
+export type ExtinguisherStatus = "active" | "expired" | "reported" | "police_notified";
+
 export enum FireExtinguisherType {
     WATER = "WATER",
     CO2 = "CO2",
@@ -29,7 +31,7 @@ export interface FireExtinguisher {
     ownerPhone: string;
     dateOfIssue: string;
     expirationDate: string;
-    status: "active" | "expired" | "reported" | "police_notified";
+    status: ExtinguisherStatus;
     alertSentAt?: string | null;
     reminderSentAt?: string | null;
     policeNotifiedAt?: string | null;
