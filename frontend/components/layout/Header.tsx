@@ -1,21 +1,20 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-
-import { clearToken } from "@/lib/auth";
+import { useAuthContext } from "@/context/AuthContext";
 
 export default function Header() {
   const router = useRouter();
+  const { admin, logout } = useAuthContext();
 
-  const logout = () => {
-    clearToken();
-
+  const handleLogout = async () => {
+    await logout();
     router.push("/login");
   };
 
   return (
     <header
-      className="flex justify-between items-center p-5 border-b"
+      className="flex justify-between items-center px-6 py-4 border-b"
       style={{
         backgroundColor: "#FFFFFF",
         borderColor: "#D2D2D2",
@@ -25,16 +24,29 @@ export default function Header() {
         Fire Extinguisher Management
       </h2>
 
-      <button
-        onClick={logout}
-        className="px-4 py-2 rounded-lg transition hover:bg-red-700"
-        style={{
-          backgroundColor: "#D32F2F",
-          color: "#FFFFFF",
-        }}
-      >
-        Logout
-      </button>
+      <div className="flex items-center gap-4">
+        {admin && (
+          <div className="text-right hidden sm:block">
+            <p className="text-sm font-medium" style={{ color: "#2F2F2F" }}>
+              {admin.name || `${admin.firstName ?? ""} ${admin.lastName ?? ""}`.trim() || admin.email}
+            </p>
+            <p className="text-xs capitalize" style={{ color: "#666666" }}>
+              {admin.role}
+            </p>
+          </div>
+        )}
+
+        <button
+          onClick={handleLogout}
+          className="px-4 py-2 rounded-lg text-sm transition hover:bg-red-700"
+          style={{
+            backgroundColor: "#D32F2F",
+            color: "#FFFFFF",
+          }}
+        >
+          Logout
+        </button>
+      </div>
     </header>
   );
 }

@@ -63,8 +63,12 @@ export default function Page() {
 
   const defaultValues: Partial<ExtinguisherSchema> = {
     ...extinguisher,
-    dateOfIssue: extinguisher.dateOfIssue.split("T")[0],
-    expirationDate: extinguisher.expirationDate.split("T")[0],
+    dateOfIssue: extinguisher.dateOfIssue
+      ? (extinguisher.dateOfIssue as string).split("T")[0]
+      : "",
+    expirationDate: extinguisher.expirationDate
+      ? (extinguisher.expirationDate as string).split("T")[0]
+      : "",
   };
 
   return (

@@ -21,25 +21,26 @@ export interface InspectionLog {
 }
 
 export interface FireExtinguisher {
+    _id: string;
     extinguisherId: string;
     ownerName: string;
     ownerIdNumber: string;
     ownerEmail: string;
     ownerPhone: string;
-    dateOfIssue: Date;
-    expirationDate: Date;
+    dateOfIssue: string;
+    expirationDate: string;
     status: "active" | "expired" | "reported" | "police_notified";
-    alertSentAt?: Date | null;
-    reminderSentAt?: Date | null;
-    policeNotifiedAt?: Date | null;
+    alertSentAt?: string | null;
+    reminderSentAt?: string | null;
+    policeNotifiedAt?: string | null;
     notes?: string;
     // Inspection & Maintenance fields
-    scheduledInspectionDate?: Date | null;
+    scheduledInspectionDate?: string | null;
     inspectionStatus?: "none" | "pending" | "completed";
-    scheduledMaintenanceDate?: Date | null;
+    scheduledMaintenanceDate?: string | null;
     maintenanceStatus?: "none" | "scheduled" | "completed";
     maintenanceNotes?: string;
     inspectionLogs: InspectionLog[];
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt: string;
+    updatedAt: string;
 }
