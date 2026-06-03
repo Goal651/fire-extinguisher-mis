@@ -97,8 +97,8 @@ services:
 
   extinguisher-service:
     build:
-      context: ./services/extinguisher-service
-      dockerfile: Dockerfile
+      context: ./services
+      dockerfile: extinguisher-service/Dockerfile
     container_name: extinguisher-service
     restart: unless-stopped
     ports:
@@ -170,8 +170,8 @@ services:
 
   notification-service:
     build:
-      context: ./services/notification-service
-      dockerfile: Dockerfile
+      context: ./services
+      dockerfile: notification-service/Dockerfile
     container_name: notification-service
     restart: unless-stopped
     ports:

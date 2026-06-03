@@ -9,6 +9,7 @@ import {
   sendExpiredNotificationEmail,
   sendPoliceEscalationEmail,
   sendPoliceNotificationEmail,
+  ExtinguisherPayload,
 } from "./services/emailService";
 
 dotenv.config();
@@ -30,26 +31,26 @@ const startConsumers = async () => {
   await connectRabbitMQ();
 
   // Queue 1 — expiry warning (owner only)
-  await consumeMessages(QUEUES.EXPIRY_WARNING, async (payload) => {
+  await consumeMessages(QUEUES.EXPIRY_WARNING, async (payload: ExtinguisherPayload) => {
     console.log(`[NOTIFY] Expiry warning → ${payload.ownerEmail}`);
     await sendExpiryWarningEmail(payload);
   });
 
   // Queue 2 — police escalation (owner + admin + police)
-  await consumeMessages(QUEUES.POLICE_ESCALATION, async (payload) => {
+  await consumeMessages(QUEUES.POLICE_ESCALATION, async (payload: ExtinguisherPayload) => {
     console.log(`[NOTIFY] Police escalation → ${payload.ownerEmail}`);
     await sendPoliceEscalationEmail(payload);
     await sendPoliceNotificationEmail(payload);
   });
 
   // Queue 3 — just expired (owner + staff)
-  await consumeMessages(QUEUES.EXPIRED, async (payload) => {
+  await consumeMessages(QUEUES.EXPIRED, async (payload: ExtinguisherPayload) => {
     console.log(`[NOTIFY] Expired notification → ${payload.ownerEmail}`);
     await sendExpiredNotificationEmail(payload);
   });
 
   // Queue 4 — already expired re-notification (owner + staff)
-  await consumeMessages(QUEUES.ALREADY_EXPIRED, async (payload) => {
+  await consumeMessages(QUEUES.ALREADY_EXPIRED, async (payload: ExtinguisherPayload) => {
     console.log(`[NOTIFY] Already-expired re-notification → ${payload.ownerEmail}`);
     await sendExpiredNotificationEmail(payload);
   });
