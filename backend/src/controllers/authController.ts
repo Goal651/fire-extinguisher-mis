@@ -7,7 +7,12 @@ import User, { IUser} from "../models/User";
 import { generateOTP } from "../utils/generateOTP";
 import { generateToken } from "../utils/generateToken";
 
-import { sendEmail } from "../services/emailService";
+import {
+  sendEmail,
+  buildOtpHtml,
+  buildPasswordResetHtml,
+  buildPasswordChangedHtml,
+} from "../services/emailService";
 import { logger } from "../utils/logger";
 
 export const login = async (req: Request, res: Response) => {
@@ -46,12 +51,7 @@ export const login = async (req: Request, res: Response) => {
     await sendEmail(
       email,
       "Your OTP Code",
-      `
-      <h2>Company XYZ Login OTP</h2>
-      <p>Your OTP is:</p>
-      <h1>${otp}</h1>
-      <p>Expires in 10 minutes.</p>
-      `,
+      buildOtpHtml(otp),
     );
 
     logger.info(`OTP sent successfully to: ${email}`);
@@ -142,12 +142,7 @@ export const resendOtp = async (req: Request, res: Response) => {
     await sendEmail(
       email,
       "Your OTP Code",
-      `
-      <h2>Company XYZ Login OTP</h2>
-      <p>Your OTP is:</p>
-      <h1>${otp}</h1>
-      <p>Expires in 10 minutes.</p>
-      `,
+      buildOtpHtml(otp),
     );
 
     logger.info(`OTP resent successfully to: ${email}`);
@@ -259,14 +254,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
     await sendEmail(
       email,
       "Password Reset Request",
-      `
-      <h2>Password Reset Request</h2>
-      <p>You requested a password reset for your account.</p>
-      <p>Click the link below to reset your password:</p>
-      <a href="${resetUrl}" style="background: #2F2F2F; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;">Reset Password</a>
-      <p>This link will expire in 30 minutes.</p>
-      <p>If you did not request this, please ignore this email.</p>
-      `,
+      buildPasswordResetHtml(resetUrl),
     );
 
     logger.info(`Password reset email sent to: ${email}`);
@@ -313,11 +301,7 @@ export const resetPassword = async (req: Request, res: Response) => {
     await sendEmail(
       user.email,
       "Password Reset Successful",
-      `
-      <h2>Password Reset Successful</h2>
-      <p>Your password has been successfully reset.</p>
-      <p>If you did not make this change, please contact support immediately.</p>
-      `,
+      buildPasswordChangedHtml("reset"),
     );
 
     return res.json({
@@ -424,11 +408,7 @@ export const changePassword = async (req: any, res: Response) => {
     await sendEmail(
       user.email,
       "Password Changed Successfully",
-      `
-      <h2>Password Changed</h2>
-      <p>Your password has been successfully changed.</p>
-      <p>If you did not make this change, please contact support immediately.</p>
-      `,
+      buildPasswordChangedHtml("changed"),
     );
 
     return res.json({
