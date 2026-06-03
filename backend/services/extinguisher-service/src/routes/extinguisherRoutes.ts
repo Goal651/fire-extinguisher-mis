@@ -12,9 +12,9 @@ import {
   scheduleInspection,
 } from "../controllers/extinguisherController";
 
-import { protect } from "../middleware/authMiddleware";
-import { authorize } from "../middleware/roleMiddleware";
-import { validateRequest } from "../middleware/validateMiddleware";
+import { protect } from "../../shared/middleware/authMiddleware";
+import { authorize } from "../../shared/middleware/roleMiddleware";
+import { validateRequest } from "../../shared/middleware/validateMiddleware";
 import { extinguisherRegistrationValidation } from "../validators/extinguisherValidators";
 
 const router = Router();

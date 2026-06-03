@@ -7,7 +7,6 @@ export const errorHandler = (
   res: Response,
   next: NextFunction,
 ) => {
-  // Log error with timestamp and request details to file
   logger.error(err.message, {
     stack: err.stack,
     url: req.url,
@@ -15,7 +14,6 @@ export const errorHandler = (
     body: req.body,
   });
 
-  // Handle Mongoose validation errors
   if (err.name === "ValidationError") {
     const errors = Object.values(err.errors).map((e: any) => ({
       field: e.path,
@@ -28,7 +26,6 @@ export const errorHandler = (
     });
   }
 
-  // Handle MongoDB duplicate key errors
   if (err.code === 11000) {
     const field = Object.keys(err.keyPattern)[0];
     return res.status(400).json({
@@ -37,7 +34,6 @@ export const errorHandler = (
     });
   }
 
-  // Handle JWT errors
   if (err.name === "JsonWebTokenError") {
     return res.status(401).json({
       success: false,
@@ -52,7 +48,6 @@ export const errorHandler = (
     });
   }
 
-  // Handle CastError (invalid ObjectId)
   if (err.name === "CastError") {
     return res.status(400).json({
       success: false,

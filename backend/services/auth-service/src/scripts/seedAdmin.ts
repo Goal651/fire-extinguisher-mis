@@ -2,8 +2,8 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import bcrypt from "bcryptjs";
-import { connectDB } from "../config/db";
-import User from "../models/User";
+import { connectDB } from "../../shared/config/db";
+import User from "../../shared/models/User";
 
 const seedAdmin = async () => {
   try {

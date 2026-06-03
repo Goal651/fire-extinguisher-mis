@@ -4,9 +4,9 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 
-import { connectDB } from "./config/db";
+import { connectDB } from "../../shared/config/db";
 import adminRoutes from "./routes/adminRoutes";
-import { errorHandler } from "./middleware/errorMiddleware";
+import { errorHandler } from "../../shared/middleware/errorMiddleware";
 
 dotenv.config();
 

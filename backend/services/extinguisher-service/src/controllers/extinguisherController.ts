@@ -1,5 +1,5 @@
 import { Response } from "express";
-import FireExtinguisher from "../models/FireExtinguisher";
+import FireExtinguisher from "../../shared/models/FireExtinguisher";
 
 export const createExtinguisher = async (req: any, res: Response) => {
   try {

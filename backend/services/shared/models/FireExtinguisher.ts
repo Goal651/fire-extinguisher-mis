@@ -4,14 +4,14 @@ export enum FireExtinguisherType {
   WATER = "WATER",
   CO2 = "CO2",
   FOAM = "FOAM",
-  DRY_CHEMICAL = "DRY_CHEMICAL"
+  DRY_CHEMICAL = "DRY_CHEMICAL",
 }
 
 export enum FireExtinguisherSize {
   "2.5LBS" = "2.5LBS",
   "5LBS" = "5LBS",
   "9LBS" = "9LBS",
-  "12LBS" = "12LBS"
+  "12LBS" = "12LBS",
 }
 
 export interface IInspectionLog {
@@ -34,7 +34,6 @@ export interface IFireExtinguisher extends Document {
   reminderSentAt?: Date | null;
   policeNotifiedAt?: Date | null;
   notes?: string;
-  // Inspection & Maintenance fields
   scheduledInspectionDate?: Date | null;
   inspectionStatus?: "none" | "pending" | "completed";
   scheduledMaintenanceDate?: Date | null;
@@ -63,7 +62,6 @@ const extinguisherSchema = new Schema<IFireExtinguisher>(
     reminderSentAt: { type: Date, default: null },
     policeNotifiedAt: { type: Date, default: null },
     notes: { type: String },
-    // Inspection & Maintenance
     scheduledInspectionDate: { type: Date, default: null },
     inspectionStatus: {
       type: String,
