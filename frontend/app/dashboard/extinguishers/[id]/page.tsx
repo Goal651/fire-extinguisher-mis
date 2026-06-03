@@ -10,6 +10,14 @@ import Input from "@/components/ui/Input";
 import { FireExtinguisher } from "@/types";
 import { extinguisherService } from "@/services/extinguisherService";
 import { useAuthContext } from "@/context/AuthContext";
+import {
+  shouldShowInspectForm,
+  shouldShowMaintenanceForm,
+  shouldShowScheduleInspectionForm,
+  getInspectBlockedReason,
+  getMaintenanceBlockedReason,
+  getScheduleInspectionBlockedReason,
+} from "@/lib/extinguisherIntelligence";
 
 export default function ExtinguisherDetailPage() {
   const params = useParams();
@@ -29,7 +37,7 @@ export default function ExtinguisherDetailPage() {
   const [maintenanceNotes, setMaintenanceNotes] = useState("");
   const [submittingMaintenance, setSubmittingMaintenance] = useState(false);
 
-  // Schedule inspection form (for users)
+  // Schedule inspection form (user)
   const [scheduleInspectionDate, setScheduleInspectionDate] = useState("");
   const [submittingSchedule, setSubmittingSchedule] = useState(false);
 
@@ -80,7 +88,11 @@ export default function ExtinguisherDetailPage() {
     if (!data || !maintenanceDate) return;
     setSubmittingMaintenance(true);
     try {
-      await extinguisherService.scheduleMaintenance(data._id, maintenanceDate, maintenanceNotes);
+      await extinguisherService.scheduleMaintenance(
+        data._id,
+        maintenanceDate,
+        maintenanceNotes
+      );
       toast.success("Maintenance scheduled successfully");
       setMaintenanceDate("");
       setMaintenanceNotes("");
@@ -97,7 +109,10 @@ export default function ExtinguisherDetailPage() {
     if (!data || !scheduleInspectionDate) return;
     setSubmittingSchedule(true);
     try {
-      await extinguisherService.scheduleInspection(data._id, scheduleInspectionDate);
+      await extinguisherService.scheduleInspection(
+        data._id,
+        scheduleInspectionDate
+      );
       toast.success("Inspection scheduled successfully");
       setScheduleInspectionDate("");
       load();
@@ -110,7 +125,10 @@ export default function ExtinguisherDetailPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-40" style={{ color: "#666666" }}>
+      <div
+        className="flex items-center justify-center min-h-40"
+        style={{ color: "#666666" }}
+      >
         Loading...
       </div>
     );
@@ -118,15 +136,39 @@ export default function ExtinguisherDetailPage() {
 
   if (!data) {
     return (
-      <div className="flex items-center justify-center min-h-40" style={{ color: "#D32F2F" }}>
+      <div
+        className="flex items-center justify-center min-h-40"
+        style={{ color: "#D32F2F" }}
+      >
         Extinguisher not found
       </div>
     );
   }
 
+  // Compute intelligence flags
+  const canInspect = role === "inspector" && shouldShowInspectForm(data);
+  const inspectBlocked =
+    role === "inspector" && !canInspect
+      ? getInspectBlockedReason(data)
+      : null;
+
+  const canMaintain =
+    role === "inspector" && shouldShowMaintenanceForm(data);
+  const maintainBlocked =
+    role === "inspector" && !canMaintain
+      ? getMaintenanceBlockedReason(data)
+      : null;
+
+  const canScheduleInspection =
+    role === "user" && shouldShowScheduleInspectionForm(data);
+  const scheduleBlocked =
+    role === "user" && !canScheduleInspection
+      ? getScheduleInspectionBlockedReason(data)
+      : null;
+
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* Header Card */}
       <div className="card space-y-6">
         <div className="flex justify-between items-start flex-wrap gap-3">
           <div>
@@ -162,11 +204,19 @@ export default function ExtinguisherDetailPage() {
           />
           <Detail
             label="Alert Sent At"
-            value={data.alertSentAt ? new Date(data.alertSentAt).toLocaleString() : "Never"}
+            value={
+              data.alertSentAt
+                ? new Date(data.alertSentAt).toLocaleString()
+                : "Never"
+            }
           />
           <Detail
             label="Police Notified At"
-            value={data.policeNotifiedAt ? new Date(data.policeNotifiedAt).toLocaleString() : "Never"}
+            value={
+              data.policeNotifiedAt
+                ? new Date(data.policeNotifiedAt).toLocaleString()
+                : "Never"
+            }
           />
           <Detail
             label="Inspection Status"
@@ -174,7 +224,11 @@ export default function ExtinguisherDetailPage() {
           />
           <Detail
             label="Scheduled Inspection"
-            value={data.scheduledInspectionDate ? new Date(data.scheduledInspectionDate).toLocaleDateString() : "Not scheduled"}
+            value={
+              data.scheduledInspectionDate
+                ? new Date(data.scheduledInspectionDate).toLocaleDateString()
+                : "Not scheduled"
+            }
           />
           <Detail
             label="Maintenance Status"
@@ -182,143 +236,231 @@ export default function ExtinguisherDetailPage() {
           />
           <Detail
             label="Scheduled Maintenance"
-            value={data.scheduledMaintenanceDate ? new Date(data.scheduledMaintenanceDate).toLocaleDateString() : "Not scheduled"}
+            value={
+              data.scheduledMaintenanceDate
+                ? new Date(
+                    data.scheduledMaintenanceDate
+                  ).toLocaleDateString()
+                : "Not scheduled"
+            }
           />
         </div>
 
         {data.notes && <Detail label="Notes" value={data.notes} />}
-        {data.maintenanceNotes && <Detail label="Maintenance Notes" value={data.maintenanceNotes} />}
+        {data.maintenanceNotes && (
+          <Detail label="Maintenance Notes" value={data.maintenanceNotes} />
+        )}
 
         {/* Admin: Mark as Reported */}
         {role === "admin" && data.status === "active" && (
           <div className="pt-4 border-t" style={{ borderColor: "#D2D2D2" }}>
-            <Button onClick={handleMarkReported} variant="danger" className="w-full">
+            <Button
+              onClick={handleMarkReported}
+              variant="danger"
+              className="w-full"
+            >
               Mark as Reported
             </Button>
           </div>
         )}
       </div>
 
-      {/* Inspector: Log Inspection */}
+      {/* ── Inspector: Log Inspection ─────────────────────────────── */}
       {role === "inspector" && (
-        <div className="card space-y-4">
-          <h2 className="text-lg font-bold" style={{ color: "#2F2F2F" }}>
-            Log Inspection Result
-          </h2>
-          <form onSubmit={handleInspect} className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium" style={{ color: "#2F2F2F" }}>
-                Result
-              </label>
-              <select
-                value={inspectResult}
-                onChange={(e) => setInspectResult(e.target.value as "pass" | "fail")}
-                className="w-full rounded-lg border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                style={{
-                  backgroundColor: "#FFFFFF",
-                  borderColor: "#D2D2D2",
-                  color: "#2F2F2F",
-                }}
-              >
-                <option value="pass">Pass</option>
-                <option value="fail">Fail</option>
-              </select>
+        <>
+          {canInspect ? (
+            <div className="card space-y-4">
+              <div>
+                <h2
+                  className="text-lg font-bold"
+                  style={{ color: "#2F2F2F" }}
+                >
+                  Log Inspection Result
+                </h2>
+                {data.inspectionStatus === "pending" &&
+                  data.scheduledInspectionDate && (
+                    <p className="text-xs mt-1" style={{ color: "#E65100" }}>
+                      Scheduled for{" "}
+                      {new Date(
+                        data.scheduledInspectionDate
+                      ).toLocaleDateString()}
+                    </p>
+                  )}
+              </div>
+              <form onSubmit={handleInspect} className="space-y-4">
+                <div className="space-y-2">
+                  <label
+                    className="text-sm font-medium"
+                    style={{ color: "#2F2F2F" }}
+                  >
+                    Result
+                  </label>
+                  <select
+                    value={inspectResult}
+                    onChange={(e) =>
+                      setInspectResult(e.target.value as "pass" | "fail")
+                    }
+                    className="w-full rounded-lg border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                    style={{
+                      backgroundColor: "#FFFFFF",
+                      borderColor: "#D2D2D2",
+                      color: "#2F2F2F",
+                    }}
+                  >
+                    <option value="pass">Pass</option>
+                    <option value="fail">Fail</option>
+                  </select>
+                </div>
+                <Input
+                  label="Notes (optional)"
+                  placeholder="Inspection notes..."
+                  value={inspectNotes}
+                  onChange={(e) => setInspectNotes(e.target.value)}
+                />
+                <Button type="submit" loading={submittingInspect}>
+                  Submit Inspection
+                </Button>
+              </form>
             </div>
-            <Input
-              label="Notes (optional)"
-              placeholder="Inspection notes..."
-              value={inspectNotes}
-              onChange={(e) => setInspectNotes(e.target.value)}
-            />
-            <Button type="submit" loading={submittingInspect}>
-              Submit Inspection
-            </Button>
-          </form>
-        </div>
+          ) : (
+            inspectBlocked && (
+              <InfoBanner icon="🔍" message={inspectBlocked} />
+            )
+          )}
+        </>
       )}
 
-      {/* Inspector: Schedule Maintenance */}
+      {/* ── Inspector: Schedule Maintenance ──────────────────────── */}
       {role === "inspector" && (
-        <div className="card space-y-4">
-          <h2 className="text-lg font-bold" style={{ color: "#2F2F2F" }}>
-            Schedule Maintenance
-          </h2>
-          <form onSubmit={handleScheduleMaintenance} className="space-y-4">
-            <Input
-              label="Maintenance Date"
-              type="date"
-              value={maintenanceDate}
-              onChange={(e) => setMaintenanceDate(e.target.value)}
-            />
-            <Input
-              label="Maintenance Notes (optional)"
-              placeholder="What needs to be done..."
-              value={maintenanceNotes}
-              onChange={(e) => setMaintenanceNotes(e.target.value)}
-            />
-            <Button type="submit" loading={submittingMaintenance}>
-              Schedule Maintenance
-            </Button>
-          </form>
-        </div>
+        <>
+          {canMaintain ? (
+            <div className="card space-y-4">
+              <div>
+                <h2
+                  className="text-lg font-bold"
+                  style={{ color: "#2F2F2F" }}
+                >
+                  Schedule Maintenance
+                </h2>
+                {data.maintenanceStatus === "scheduled" &&
+                  data.scheduledMaintenanceDate &&
+                  new Date(data.scheduledMaintenanceDate) < new Date() && (
+                    <p className="text-xs mt-1" style={{ color: "#D32F2F" }}>
+                      Previous maintenance date{" "}
+                      {new Date(
+                        data.scheduledMaintenanceDate
+                      ).toLocaleDateString()}{" "}
+                      has passed. Reschedule below.
+                    </p>
+                  )}
+              </div>
+              <form onSubmit={handleScheduleMaintenance} className="space-y-4">
+                <Input
+                  label="Maintenance Date"
+                  type="date"
+                  value={maintenanceDate}
+                  onChange={(e) => setMaintenanceDate(e.target.value)}
+                />
+                <Input
+                  label="Maintenance Notes (optional)"
+                  placeholder="What needs to be done..."
+                  value={maintenanceNotes}
+                  onChange={(e) => setMaintenanceNotes(e.target.value)}
+                />
+                <Button type="submit" loading={submittingMaintenance}>
+                  Schedule Maintenance
+                </Button>
+              </form>
+            </div>
+          ) : (
+            maintainBlocked && (
+              <InfoBanner icon="🔧" message={maintainBlocked} />
+            )
+          )}
+        </>
       )}
 
-      {/* User: Schedule Inspection */}
+      {/* ── User: Request Inspection ──────────────────────────────── */}
       {role === "user" && (
-        <div className="card space-y-4">
-          <h2 className="text-lg font-bold" style={{ color: "#2F2F2F" }}>
-            Request Inspection
-          </h2>
-          <p className="text-sm" style={{ color: "#666666" }}>
-            Choose a preferred date to schedule an inspection for this extinguisher.
-          </p>
-          <form onSubmit={handleScheduleInspection} className="space-y-4">
-            <Input
-              label="Preferred Inspection Date"
-              type="date"
-              value={scheduleInspectionDate}
-              onChange={(e) => setScheduleInspectionDate(e.target.value)}
-            />
-            <Button type="submit" loading={submittingSchedule}>
-              Schedule Inspection
-            </Button>
-          </form>
-        </div>
+        <>
+          {canScheduleInspection ? (
+            <div className="card space-y-4">
+              <div>
+                <h2
+                  className="text-lg font-bold"
+                  style={{ color: "#2F2F2F" }}
+                >
+                  Request Inspection
+                </h2>
+                <p className="text-sm mt-1" style={{ color: "#666666" }}>
+                  Choose a preferred date and an inspector will be assigned.
+                </p>
+              </div>
+              <form onSubmit={handleScheduleInspection} className="space-y-4">
+                <Input
+                  label="Preferred Inspection Date"
+                  type="date"
+                  value={scheduleInspectionDate}
+                  onChange={(e) => setScheduleInspectionDate(e.target.value)}
+                />
+                <Button type="submit" loading={submittingSchedule}>
+                  Schedule Inspection
+                </Button>
+              </form>
+            </div>
+          ) : (
+            scheduleBlocked && (
+              <InfoBanner icon="📅" message={scheduleBlocked} />
+            )
+          )}
+        </>
       )}
 
-      {/* Inspection Logs */}
+      {/* ── Inspection History ────────────────────────────────────── */}
       {data.inspectionLogs && data.inspectionLogs.length > 0 && (
         <div className="card space-y-4">
           <h2 className="text-lg font-bold" style={{ color: "#2F2F2F" }}>
             Inspection History
           </h2>
           <div className="space-y-3">
-            {data.inspectionLogs.map((log, idx) => (
-              <div
-                key={idx}
-                className="flex items-start gap-3 p-3 rounded-lg border"
-                style={{ borderColor: "#D2D2D2" }}
-              >
-                <span
-                  className="mt-0.5 w-2.5 h-2.5 rounded-full flex-shrink-0"
-                  style={{
-                    backgroundColor: log.result === "pass" ? "#4CAF50" : "#F44336",
-                    marginTop: "5px",
-                  }}
-                />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold" style={{ color: "#2F2F2F" }}>
-                    {log.result.toUpperCase()} &mdash;{" "}
-                    {new Date(log.inspectedAt).toLocaleDateString()}
-                  </p>
-                  {log.notes && (
-                    <p className="text-xs mt-1" style={{ color: "#666666" }}>
-                      {log.notes}
+            {[...data.inspectionLogs]
+              .sort(
+                (a, b) =>
+                  new Date(b.inspectedAt).getTime() -
+                  new Date(a.inspectedAt).getTime()
+              )
+              .map((log, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-start gap-3 p-3 rounded-lg border"
+                  style={{ borderColor: "#D2D2D2" }}
+                >
+                  <span
+                    className="w-2.5 h-2.5 rounded-full flex-shrink-0 mt-1"
+                    style={{
+                      backgroundColor:
+                        log.result === "pass" ? "#4CAF50" : "#F44336",
+                    }}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p
+                      className="text-sm font-semibold"
+                      style={{ color: "#2F2F2F" }}
+                    >
+                      {log.result.toUpperCase()} &mdash;{" "}
+                      {new Date(log.inspectedAt).toLocaleDateString()}
                     </p>
-                  )}
+                    {log.notes && (
+                      <p
+                        className="text-xs mt-1"
+                        style={{ color: "#666666" }}
+                      >
+                        {log.notes}
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         </div>
       )}
@@ -326,11 +468,33 @@ export default function ExtinguisherDetailPage() {
   );
 }
 
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
 function Detail({ label, value }: { label: string; value: string }) {
   return (
     <div className="space-y-1">
-      <p className="text-sm" style={{ color: "#666666" }}>{label}</p>
-      <p className="font-medium" style={{ color: "#2F2F2F" }}>{value}</p>
+      <p className="text-sm" style={{ color: "#666666" }}>
+        {label}
+      </p>
+      <p className="font-medium" style={{ color: "#2F2F2F" }}>
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function InfoBanner({ icon, message }: { icon: string; message: string }) {
+  return (
+    <div
+      className="flex items-start gap-3 px-4 py-3 rounded-lg border text-sm"
+      style={{
+        backgroundColor: "#F9F9F9",
+        borderColor: "#D2D2D2",
+        color: "#666666",
+      }}
+    >
+      <span className="text-base flex-shrink-0">{icon}</span>
+      <span>{message}</span>
     </div>
   );
 }
