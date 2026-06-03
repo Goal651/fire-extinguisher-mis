@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import helmet from "helmet";
 import morgan from "morgan";
 
-import { connectRabbitMQ, consumeMessages, QUEUES } from "../shared/rabbitmq";
+import { connectRabbitMQ, consumeMessages, QUEUES } from "../../shared/rabbitmq";
 import {
   sendExpiryWarningEmail,
   sendExpiredNotificationEmail,

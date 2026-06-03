@@ -6,12 +6,19 @@ services:
       dockerfile: Dockerfile.dev
     volumes:
       - ./services/gateway:/app
-      - ./services/shared:/app/shared
+      - ./services/shared:/shared              # ../../shared from /app/src/ resolves to /shared
       - gateway_nm:/app/node_modules
-      - pnpm_store:/root/.local/share/pnpm/store/v11   # host store mounted read-only
+      - pnpm_store:/root/.local/share/pnpm/store/v11
+    env_file: .env
     environment:
       NODE_ENV: development
+      PORT: 3000
+      AUTH_SERVICE_URL: http://auth-service:3001
+      EXTINGUISHER_SERVICE_URL: http://extinguisher-service:3002
+      ADMIN_SERVICE_URL: http://admin-service:3003
+      REPORT_SERVICE_URL: http://report-service:3004
       PNPM_STORE_DIR: /root/.local/share/pnpm/store/v11
+      NODE_PATH: /app/node_modules
 
   auth-service:
     build:
@@ -19,12 +26,16 @@ services:
       dockerfile: Dockerfile.dev
     volumes:
       - ./services/auth-service:/app
-      - ./services/shared:/app/shared
+      - ./services/shared:/shared
       - auth_nm:/app/node_modules
       - pnpm_store:/root/.local/share/pnpm/store/v11
+    env_file: .env
     environment:
       NODE_ENV: development
+      PORT: 3001
+      MONGODB_URI: mongodb://mongo:27017/fire_extinguisher_db
       PNPM_STORE_DIR: /root/.local/share/pnpm/store/v11
+      NODE_PATH: /app/node_modules
 
   extinguisher-service:
     build:
@@ -32,12 +43,17 @@ services:
       dockerfile: Dockerfile.dev
     volumes:
       - ./services/extinguisher-service:/app
-      - ./services/shared:/app/shared
+      - ./services/shared:/shared
       - extinguisher_nm:/app/node_modules
       - pnpm_store:/root/.local/share/pnpm/store/v11
+    env_file: .env
     environment:
       NODE_ENV: development
+      PORT: 3002
+      MONGODB_URI: mongodb://mongo:27017/fire_extinguisher_db
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
       PNPM_STORE_DIR: /root/.local/share/pnpm/store/v11
+      NODE_PATH: /app/node_modules
 
   admin-service:
     build:
@@ -45,12 +61,16 @@ services:
       dockerfile: Dockerfile.dev
     volumes:
       - ./services/admin-service:/app
-      - ./services/shared:/app/shared
+      - ./services/shared:/shared
       - admin_nm:/app/node_modules
       - pnpm_store:/root/.local/share/pnpm/store/v11
+    env_file: .env
     environment:
       NODE_ENV: development
+      PORT: 3003
+      MONGODB_URI: mongodb://mongo:27017/fire_extinguisher_db
       PNPM_STORE_DIR: /root/.local/share/pnpm/store/v11
+      NODE_PATH: /app/node_modules
 
   report-service:
     build:
@@ -58,12 +78,16 @@ services:
       dockerfile: Dockerfile.dev
     volumes:
       - ./services/report-service:/app
-      - ./services/shared:/app/shared
+      - ./services/shared:/shared
       - report_nm:/app/node_modules
       - pnpm_store:/root/.local/share/pnpm/store/v11
+    env_file: .env
     environment:
       NODE_ENV: development
+      PORT: 3004
+      MONGODB_URI: mongodb://mongo:27017/fire_extinguisher_db
       PNPM_STORE_DIR: /root/.local/share/pnpm/store/v11
+      NODE_PATH: /app/node_modules
 
   notification-service:
     build:
@@ -71,12 +95,16 @@ services:
       dockerfile: Dockerfile.dev
     volumes:
       - ./services/notification-service:/app
-      - ./services/shared:/app/shared
+      - ./services/shared:/shared
       - notification_nm:/app/node_modules
       - pnpm_store:/root/.local/share/pnpm/store/v11
+    env_file: .env
     environment:
       NODE_ENV: development
+      PORT: 3005
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
       PNPM_STORE_DIR: /root/.local/share/pnpm/store/v11
+      NODE_PATH: /app/node_modules
 
 volumes:
   gateway_nm:
