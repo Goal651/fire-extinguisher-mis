@@ -167,14 +167,14 @@ export default function ReportsPage() {
 
 function SummaryTab({ data }: { data: SummaryReportData }) {
   const kpis = [
-    { label: "Total Extinguishers", value: data.stock.total,            color: CHART_COLORS.primary },
-    { label: "Active",              value: data.stock.active,           color: CHART_COLORS.active },
-    { label: "Expired",             value: data.stock.expired,          color: CHART_COLORS.expired },
-    { label: "Police Notified",     value: data.stock.policeNotified,   color: CHART_COLORS.police },
-    { label: "Inspections Done",    value: data.inspections.completed,  color: CHART_COLORS.pass },
+    { label: "Total Extinguishers", value: data.stock.total            ?? 0, color: CHART_COLORS.primary },
+    { label: "Active",              value: data.stock.active           ?? 0, color: CHART_COLORS.active },
+    { label: "Expired",             value: data.stock.expired          ?? 0, color: CHART_COLORS.expired },
+    { label: "Police Notified",     value: data.stock.policeNotified   ?? 0, color: CHART_COLORS.police },
+    { label: "Inspections Done",    value: data.inspections.completed  ?? 0, color: CHART_COLORS.pass },
     { label: "Pass Rate",           value: `${data.inspections.passRate ?? 0}%`, color: CHART_COLORS.pass },
-    { label: "Pending Maintenance", value: data.maintenance.scheduled,  color: CHART_COLORS.scheduled },
-    { label: "Maintenance Done",    value: data.maintenance.completed,  color: CHART_COLORS.completed },
+    { label: "Pending Maintenance", value: data.maintenance.scheduled  ?? 0, color: CHART_COLORS.scheduled },
+    { label: "Maintenance Done",    value: data.maintenance.completed  ?? 0, color: CHART_COLORS.completed },
   ];
 
   const stockPie = [
@@ -204,7 +204,7 @@ function SummaryTab({ data }: { data: SummaryReportData }) {
           {stockPie.length > 0 ? (
             <ResponsiveContainer width="100%" height={220}>
               <PieChart>
-                <Pie data={stockPie} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`} labelLine={false}>
+                <Pie data={stockPie} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label={({ name, percent }) => `${name} ${(percent! * 100).toFixed(0)}%`} labelLine={false}>
                   {stockPie.map((entry, i) => <Cell key={i} fill={entry.fill} />)}
                 </Pie>
                 <Tooltip />
@@ -217,7 +217,7 @@ function SummaryTab({ data }: { data: SummaryReportData }) {
           {inspPie.length > 0 ? (
             <ResponsiveContainer width="100%" height={220}>
               <PieChart>
-                <Pie data={inspPie} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`} labelLine={false}>
+                <Pie data={inspPie} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label={({ name, percent }) => `${name} ${(percent! * 100).toFixed(0)}%`} labelLine={false}>
                   {inspPie.map((entry, i) => <Cell key={i} fill={entry.fill} />)}
                 </Pie>
                 <Tooltip />
@@ -323,7 +323,7 @@ function InspectionsTab({ data }: { data: InspectionReportData }) {
             <ResponsiveContainer width="100%" height={220}>
               <PieChart>
                 <Pie data={results} dataKey="value" nameKey="label" cx="50%" cy="50%" outerRadius={80}
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`} labelLine={false}>
+                  label={({ name, percent }) => `${name} ${(percent! * 100).toFixed(0)}%`} labelLine={false}>
                   {results.map((r, i) => <Cell key={i} fill={r.fill} />)}
                 </Pie>
                 <Tooltip />
