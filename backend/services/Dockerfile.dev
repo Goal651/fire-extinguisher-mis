@@ -1,0 +1,8 @@
+FROM node:20-alpine
+WORKDIR /app
+
+# nodemon and ts-node come from the mounted host node_modules,
+# but we need the binaries available — symlink them from the mount.
+# The actual node_modules are mounted via docker-compose volume.
+
+CMD ["node_modules/.bin/nodemon", "--watch", "src", "--ext", "ts", "--exec", "node_modules/.bin/ts-node", "src/index.ts"]

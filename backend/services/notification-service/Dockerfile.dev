@@ -1,0 +1,5 @@
+FROM node:20-alpine
+WORKDIR /app
+# Source, shared folder, and node_modules are all bind-mounted from the host.
+# No install step — use your system pnpm-installed node_modules.
+CMD ["node_modules/.bin/nodemon", "--watch", "src", "--ext", "ts", "--exec", "node_modules/.bin/ts-node", "src/index.ts"]
