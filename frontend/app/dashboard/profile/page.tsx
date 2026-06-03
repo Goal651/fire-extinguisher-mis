@@ -11,12 +11,12 @@ import {
   updateProfileSchema, UpdateProfileSchema,
   changePasswordSchema, ChangePasswordSchema,
 } from "@/validations/profileSchema";
-import { Admin } from "@/types";
+import { Admin, User } from "@/types";
 
 type Tab = "profile" | "password";
 
 export default function ProfilePage() {
-  const [admin, setAdmin] = useState<Admin | null>(null);
+  const [admin, setAdmin] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<Tab>("profile");
 
@@ -42,7 +42,7 @@ export default function ProfilePage() {
   });
 
   useEffect(() => {
-    if (admin) profileForm.reset({ name: admin.name, email: admin.email });
+    if (admin) profileForm.reset({ name: admin.firstName + " " + admin.lastName, email: admin.email });
   }, [admin]);
 
   const onProfileUpdate = async (data: UpdateProfileSchema) => {

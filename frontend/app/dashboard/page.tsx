@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   Flame, Users, ShieldCheck, ClipboardList,
-  Wrench, ArrowRight,
+  Wrench, ArrowRight, BarChart2,
 } from "lucide-react";
 import { FireExtinguisher } from "@/types";
 import api from "@/lib/axios";
@@ -25,17 +25,19 @@ const ROLE_META = {
   admin: {
     subtitle: "Full system access — manage extinguishers, users, and data integrity.",
     quickActions: [
-      { title: "Extinguishers", desc: "View, add, edit and remove records.", href: "/dashboard/extinguishers", icon: <Flame size={18} strokeWidth={2} /> },
-      { title: "Users", desc: "Manage admin, inspector and user accounts.", href: "/dashboard/users", icon: <Users size={18} strokeWidth={2} /> },
-      { title: "Data Integrity", desc: "Run diagnostics and auto-cleanup.", href: "/dashboard/data-integrity", icon: <ShieldCheck size={18} strokeWidth={2} /> },
+      { title: "Extinguishers", desc: "View, add, edit and remove records.",       href: "/dashboard/extinguishers",  icon: <Flame size={18} strokeWidth={2} /> },
+      { title: "Users",         desc: "Manage admin, inspector and user accounts.",href: "/dashboard/users",          icon: <Users size={18} strokeWidth={2} /> },
+      { title: "Reports",       desc: "Analytics, trends and period reports.",     href: "/dashboard/reports",        icon: <BarChart2 size={18} strokeWidth={2} /> },
+      { title: "Data Integrity",desc: "Run diagnostics and auto-cleanup.",         href: "/dashboard/data-integrity", icon: <ShieldCheck size={18} strokeWidth={2} /> },
     ],
   },
   inspector: {
     subtitle: "Conduct inspections, log results and schedule maintenance.",
     quickActions: [
-      { title: "Inspections", desc: "View and log pending inspections.", href: "/dashboard/inspections", icon: <ClipboardList size={18} strokeWidth={2} /> },
-      { title: "Maintenance", desc: "Track and schedule maintenance tasks.", href: "/dashboard/maintenance", icon: <Wrench size={18} strokeWidth={2} /> },
-      { title: "Extinguishers", desc: "Browse all registered records.", href: "/dashboard/extinguishers", icon: <Flame size={18} strokeWidth={2} /> },
+      { title: "Inspections",  desc: "View and log pending inspections.",       href: "/dashboard/inspections", icon: <ClipboardList size={18} strokeWidth={2} /> },
+      { title: "Maintenance",  desc: "Track and schedule maintenance tasks.",   href: "/dashboard/maintenance", icon: <Wrench size={18} strokeWidth={2} /> },
+      { title: "Reports",      desc: "Analytics and trends.",                   href: "/dashboard/reports",     icon: <BarChart2 size={18} strokeWidth={2} /> },
+      { title: "Extinguishers",desc: "Browse all registered records.",          href: "/dashboard/extinguishers",icon: <Flame size={18} strokeWidth={2} /> },
     ],
   },
   user: {

@@ -22,7 +22,7 @@ const layout = (content: string, title: string) => `
           <!-- Header -->
           <tr>
             <td style="background:#0a0a0a;padding:28px 40px;text-align:center;">
-              <span style="font-size:22px;font-weight:700;color:#ffffff;letter-spacing:1px;">Company XYZ</span>
+              <span style="font-size:22px;font-weight:700;color:#ffffff;letter-spacing:1px;">TZW LTD</span>
               <br/>
               <span style="font-size:12px;color:#aaaaaa;letter-spacing:2px;text-transform:uppercase;">Safety Management System</span>
             </td>
@@ -44,7 +44,7 @@ const layout = (content: string, title: string) => `
           <tr>
             <td style="background:#f9f9f9;border-top:1px solid #e8e8e8;padding:20px 40px;text-align:center;">
               <p style="margin:0;font-size:12px;color:#888888;">
-                This is an automated message from Company XYZ Safety Department.<br/>
+                This is an automated message from TZW LTD Safety Department.<br/>
                 Please do not reply directly to this email.
               </p>
             </td>
@@ -196,7 +196,7 @@ export const sendExpiryWarningEmail = async (
       { label: "Status", value: "Expiring Soon" },
     ])}
     ${divider()}
-    ${paragraph("Please report to <strong>Company XYZ</strong> immediately for inspection or renewal.")}
+    ${paragraph("Please report to <strong>TZW LTD</strong> immediately for inspection or renewal.")}
     ${paragraph('<span style="color:#c62828;font-weight:600;">Failure to respond within 3 days may result in escalation to the relevant authorities.</span>')}
   `,
     "Fire Extinguisher Expiry Notice",
@@ -230,7 +230,7 @@ export const sendPoliceEscalationEmail = async (
       { label: "Status", value: "Police Notified" },
     ])}
     ${divider()}
-    ${paragraph("If you believe this is an error or wish to resolve this matter, please contact Company XYZ immediately.")}
+    ${paragraph("If you believe this is an error or wish to resolve this matter, please contact TZW LTD immediately.")}
   `,
     "Final Notice - Authorities Contacted",
   );
@@ -266,7 +266,7 @@ export const sendPoliceNotificationEmail = async (
       { label: "Initial Alert Sent", value: extinguisher.alertSentAt ? new Date(extinguisher.alertSentAt).toDateString() : "N/A" },
     ])}
     ${divider()}
-    ${paragraph("This report was generated automatically by the Company XYZ Safety Management System.")}
+    ${paragraph("This report was generated automatically by the TZW LTD Safety Management System.")}
   `,
     "Non-Compliance Report",
   );

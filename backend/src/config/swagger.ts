@@ -9,7 +9,7 @@ const options: swaggerJsdoc.Options = {
       description:
         "API for managing fire extinguishers with expiry tracking and automated compliance notifications. Supports role-based access control for Admins, Inspectors, and regular Users.",
       contact: {
-        name: "Company XYZ",
+        name: "TZW LTD",
         email: "admin@companyxyz.com",
       },
     },

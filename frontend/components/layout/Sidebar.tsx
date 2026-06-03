@@ -14,6 +14,7 @@ import {
   UserCircle,
   Menu,
   X,
+  BarChart2,
 } from "lucide-react";
 
 interface NavLink {
@@ -35,16 +36,18 @@ export default function Sidebar() {
   if (role === "admin") {
     links.push(
       { href: "/dashboard/extinguishers", label: "Extinguishers", icon: <Flame size={16} /> },
-      { href: "/dashboard/users", label: "Users", icon: <Users size={16} /> },
-      { href: "/dashboard/data-integrity", label: "Data Integrity", icon: <ShieldCheck size={16} /> },
+      { href: "/dashboard/users",         label: "Users",         icon: <Users size={16} /> },
+      { href: "/dashboard/reports",       label: "Reports",       icon: <BarChart2 size={16} /> },
+      { href: "/dashboard/data-integrity",label: "Data Integrity",icon: <ShieldCheck size={16} /> },
     );
   }
 
   if (role === "inspector") {
     links.push(
       { href: "/dashboard/extinguishers", label: "Extinguishers", icon: <Flame size={16} /> },
-      { href: "/dashboard/inspections", label: "Inspections", icon: <ClipboardList size={16} /> },
-      { href: "/dashboard/maintenance", label: "Maintenance", icon: <Wrench size={16} /> },
+      { href: "/dashboard/inspections",   label: "Inspections",   icon: <ClipboardList size={16} /> },
+      { href: "/dashboard/maintenance",   label: "Maintenance",   icon: <Wrench size={16} /> },
+      { href: "/dashboard/reports",       label: "Reports",       icon: <BarChart2 size={16} /> },
     );
   }
 
