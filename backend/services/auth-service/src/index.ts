@@ -7,6 +7,7 @@ import morgan from "morgan";
 import { connectDB } from "../shared/config/db";
 import authRoutes from "./routes/authRoutes";
 import { errorHandler } from "../shared/middleware/errorMiddleware";
+import { swaggerSpec } from "./config/swagger";
 
 import "./scripts/seedAdmin";
 
@@ -24,6 +25,7 @@ app.get("/health", (_req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.get("/api-docs/json", (_req, res) => res.json(swaggerSpec));
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 3001;
