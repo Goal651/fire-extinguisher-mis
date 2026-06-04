@@ -12,7 +12,7 @@ import {
   buildOtpHtml,
   buildPasswordResetHtml,
   buildPasswordChangedHtml,
-} from "../services/emailService";
+} from "../emailService";
 import { logger } from "../utils/logger";
 
 export const login = async (req: Request, res: Response) => {
