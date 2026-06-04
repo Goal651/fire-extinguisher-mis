@@ -9,8 +9,10 @@ export default function Header() {
   const { admin, logout } = useAuthContext();
 
   const handleLogout = async () => {
-    await logout();
-    router.push("/login");
+    if (confirm("Are you sure you want to logout?")) {
+      await logout();
+      router.push("/login");
+    }
   };
 
   const displayName =

@@ -135,6 +135,8 @@ export default function ProfilePage() {
             <Input
               label="Email"
               type="email"
+              disabled
+              className="cursor-not-allowed"
               placeholder="you@example.com"
               {...profileForm.register("email")}
               error={profileForm.formState.errors.email?.message}

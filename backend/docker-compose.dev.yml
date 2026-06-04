@@ -1,7 +1,7 @@
 services:
 
   mongo:
-    image: mongo:4.4
+    image: mongo:7.0
     container_name: mongo
     restart: unless-stopped
     ports:
@@ -12,7 +12,7 @@ services:
       - backend
 
   rabbitmq:
-    image: rabbitmq:3-management
+    image: rabbitmq:4-management
     container_name: rabbitmq
     restart: unless-stopped
     ports:
@@ -185,7 +185,7 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /home/hacker/.local/share/pnpm/store/v11
+      device: /home/kali/.local/share/pnpm/store/v10
 
 networks:
   backend:
