@@ -1,8 +1,8 @@
 import { Response,Request } from "express";
 import bcrypt from "bcryptjs";
-import User from "../models/User";
-import FireExtinguisher from "../models/FireExtinguisher";
-import { logger } from "../utils/logger";
+import User from "../../shared/models/User";
+import FireExtinguisher from "../../shared/models/FireExtinguisher";
+import { logger } from "../../shared/utils/logger";
 
 // Get all users
 export const getUsers = async (req: Request, res: Response) => {

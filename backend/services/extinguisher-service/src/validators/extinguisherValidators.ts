@@ -1,4 +1,5 @@
 import { body } from "express-validator";
+import { FireExtinguisherSize, FireExtinguisherType } from "../../shared/models/FireExtinguisher";
 
 export const extinguisherRegistrationValidation = [
   body("extinguisherId")
@@ -13,6 +14,14 @@ export const extinguisherRegistrationValidation = [
   body("ownerEmail")
     .isEmail()
     .withMessage("Valid owner email is required"),
+  body("type")
+    .notEmpty()
+    .isIn([FireExtinguisherType.WATER, FireExtinguisherType.CO2, FireExtinguisherType.FOAM, FireExtinguisherType.DRY_CHEMICAL])
+    .withMessage("Invalid extinguisher type"),
+  body("size")
+    .notEmpty()
+    .isIn([FireExtinguisherSize["2.5LBS"], FireExtinguisherSize["5LBS"], FireExtinguisherSize["9LBS"], FireExtinguisherSize["12LBS"]])
+    .withMessage("Invalid extinguisher size"),
   body("ownerPhone")
     .notEmpty()
     .withMessage("Owner phone is required"),

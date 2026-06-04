@@ -7,6 +7,11 @@ import { AuthProvider } from "@/context/AuthContext";
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
+export const metadata = {
+  title: "TZW LTD",
+  description: "Fire Extinguisher Management System",
+};
+
 export default function RootLayout({
   children,
 }: {

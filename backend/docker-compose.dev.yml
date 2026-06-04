@@ -1,0 +1,192 @@
+services:
+
+  mongo:
+    image: mongo:4.4
+    container_name: mongo
+    restart: unless-stopped
+    ports:
+      - "6000:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - backend
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - backend
+
+  gateway:
+    build:
+      context: ./services/gateway
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./services/gateway:/app
+      - gateway_nm:/app/node_modules
+      - pnpm_store:/root/.local/share/pnpm/store/v11
+    env_file: .env
+    environment:
+      NODE_ENV: development
+      PORT: 5000
+      AUTH_SERVICE_URL: http://auth-service:3001
+      EXTINGUISHER_SERVICE_URL: http://extinguisher-service:3002
+      ADMIN_SERVICE_URL: http://admin-service:3003
+      REPORT_SERVICE_URL: http://report-service:3004
+      NODE_PATH: /app/node_modules
+      PNPM_STORE_DIR: /root/.local/share/pnpm/store/v11
+    depends_on:
+      - auth-service
+      - extinguisher-service
+      - admin-service
+      - report-service
+    networks:
+      - backend
+    ports:
+      - "5000:5000"
+
+  auth-service:
+    build:
+      context: ./services/auth-service
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./services/auth-service:/app
+      - auth_nm:/app/node_modules
+      - pnpm_store:/root/.local/share/pnpm/store/v11
+    env_file: .env
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      MONGODB_URI: mongodb://mongo:27017/fire_extinguisher_db
+      NODE_PATH: /app/node_modules
+      PNPM_STORE_DIR: /root/.local/share/pnpm/store/v11
+    depends_on:
+      - mongo
+    networks:
+      - backend
+    ports:
+      - "3001:3001"
+
+  extinguisher-service:
+    build:
+      context: ./services/extinguisher-service
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./services/extinguisher-service:/app
+      - extinguisher_nm:/app/node_modules
+      - pnpm_store:/root/.local/share/pnpm/store/v11
+    env_file: .env
+    environment:
+      NODE_ENV: development
+      PORT: 3002
+      MONGODB_URI: mongodb://mongo:27017/fire_extinguisher_db
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      NODE_PATH: /app/node_modules
+      PNPM_STORE_DIR: /root/.local/share/pnpm/store/v11
+    depends_on:
+      mongo:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - backend
+    ports:
+      - "3002:3002"
+
+  admin-service:
+    build:
+      context: ./services/admin-service
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./services/admin-service:/app
+      - admin_nm:/app/node_modules
+      - pnpm_store:/root/.local/share/pnpm/store/v11
+    env_file: .env
+    environment:
+      NODE_ENV: development
+      PORT: 3003
+      MONGODB_URI: mongodb://mongo:27017/fire_extinguisher_db
+      NODE_PATH: /app/node_modules
+      PNPM_STORE_DIR: /root/.local/share/pnpm/store/v11
+    depends_on:
+      - mongo
+    networks:
+      - backend
+    ports:
+      - "3003:3003"
+
+  report-service:
+    build:
+      context: ./services/report-service
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./services/report-service:/app
+      - report_nm:/app/node_modules
+      - pnpm_store:/root/.local/share/pnpm/store/v11
+    env_file: .env
+    environment:
+      NODE_ENV: development
+      PORT: 3004
+      MONGODB_URI: mongodb://mongo:27017/fire_extinguisher_db
+      NODE_PATH: /app/node_modules
+      PNPM_STORE_DIR: /root/.local/share/pnpm/store/v11
+    depends_on:
+      - mongo
+    networks:
+      - backend
+    ports:
+      - "3004:3004"
+
+  notification-service:
+    build:
+      context: ./services/notification-service
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./services/notification-service:/app
+      - notification_nm:/app/node_modules
+      - pnpm_store:/root/.local/share/pnpm/store/v11
+    env_file: .env
+    environment:
+      NODE_ENV: development
+      PORT: 3005
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      NODE_PATH: /app/node_modules
+      PNPM_STORE_DIR: /root/.local/share/pnpm/store/v11
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - backend
+    ports:
+      - "3005:3005"
+
+volumes:
+  mongo_data:
+  gateway_nm:
+  auth_nm:
+  extinguisher_nm:
+  admin_nm:
+  report_nm:
+  notification_nm:
+  pnpm_store:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/hacker/.local/share/pnpm/store/v11
+
+networks:
+  backend:
+    driver: bridge

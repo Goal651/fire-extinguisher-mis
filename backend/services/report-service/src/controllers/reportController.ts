@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import FireExtinguisher from "../models/FireExtinguisher";
+import FireExtinguisher from "../../shared/models/FireExtinguisher";
 import type { Period } from "../types/reports";
 
 // ─────────────────────────────────────────────────────────────

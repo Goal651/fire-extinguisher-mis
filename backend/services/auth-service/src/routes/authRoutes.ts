@@ -14,10 +14,9 @@ import {
   changePassword,
 } from "../controllers/authController";
 
-import { protect } from "../middleware/authMiddleware";
-
-import { validateRequest } from "../middleware/validateMiddleware";
-import { loginLimiter } from "../middleware/rateLimit";
+import { protect } from "../../shared/middleware/authMiddleware";
+import { validateRequest } from "../../shared/middleware/validateMiddleware";
+import { loginLimiter } from "../../shared/middleware/rateLimit";
 import {
   registerValidation,
   forgotPasswordValidation,

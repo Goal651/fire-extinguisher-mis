@@ -19,16 +19,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div className="flex min-h-screen" style={{ backgroundColor: "#f8f8f8" }}>
-      {/* Sidebar handles its own mobile/desktop rendering */}
+    <div className="min-h-screen" style={{ backgroundColor: "#f8f8f8" }}>
       <Sidebar />
 
-      {/* Main content column */}
-      <div className="flex-1 flex flex-col min-w-0">
-        <Header />
-        <main className="flex-1 p-4 sm:p-6">
-          {children}
-        </main>
+      {/* Offset content for fixed desktop sidebar and fixed mobile top bar */}
+      <div className="lg:pl-60 flex flex-col min-h-screen">
+        <div className="pt-14 lg:pt-0">
+          <Header />
+          <main className="flex-1 p-4 sm:p-6">
+            {children}
+          </main>
+        </div>
       </div>
     </div>
   );

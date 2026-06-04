@@ -6,8 +6,8 @@ import {
   getMaintenanceReport,
   getSummaryReport,
 } from "../controllers/reportController";
-import { protect } from "../middleware/authMiddleware";
-import { authorize } from "../middleware/roleMiddleware";
+import { protect } from "../../shared/middleware/authMiddleware";
+import { authorize } from "../../shared/middleware/roleMiddleware";
 
 const router = Router();
 

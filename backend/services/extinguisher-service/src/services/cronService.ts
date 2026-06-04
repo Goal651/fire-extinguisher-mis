@@ -1,5 +1,5 @@
 import cron from "node-cron";
-import FireExtinguisher from "../models/FireExtinguisher";
+import FireExtinguisher from "../../shared/models/FireExtinguisher";
 import { publishMessage, QUEUES } from "../../shared/rabbitmq";
 
 export const startCronJobs = () => {

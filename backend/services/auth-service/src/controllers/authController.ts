@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 
-import User, { IUser} from "../models/User";
+import User, { IUser} from "../../shared/models/User";
 
 import { generateOTP } from "../utils/generateOTP";
 import { generateToken } from "../utils/generateToken";
@@ -12,8 +12,8 @@ import {
   buildOtpHtml,
   buildPasswordResetHtml,
   buildPasswordChangedHtml,
-} from "../emailService";
-import { logger } from "../utils/logger";
+} from "../services/emailService";
+import { logger } from "../../shared/utils/logger";
 
 export const login = async (req: Request, res: Response) => {
   try {

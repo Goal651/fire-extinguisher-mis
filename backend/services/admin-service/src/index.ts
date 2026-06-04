@@ -4,9 +4,10 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 
-import { connectDB } from "./config/db";
+import { connectDB } from "../shared/config/db";
 import adminRoutes from "./routes/adminRoutes";
-import { errorHandler } from "./middleware/errorMiddleware";
+import { errorHandler } from "../shared/middleware/errorMiddleware";
+import { swaggerSpec } from "./config/swagger";
 
 dotenv.config();
 
@@ -22,6 +23,7 @@ app.get("/health", (_req, res) => {
 });
 
 app.use("/api/admin", adminRoutes);
+app.get("/api-docs/json", (_req, res) => res.json(swaggerSpec));
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 3003;

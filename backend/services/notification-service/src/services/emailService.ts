@@ -1,4 +1,4 @@
-import { transporter } from "../config/mailer";
+import { transporter } from "../../shared/config/mailer";
 
 // Plain payload shape received from RabbitMQ
 export interface ExtinguisherPayload {
